@@ -40,6 +40,8 @@ module Hints         = Ser_hints
 module Goptions      = Ser_goptions
 module Genredexpr    = Ser_genredexpr
 module Universes     = Ser_universes
+module Attributes    = Ser_attributes
+module Gramlib       = Ser_gramlib
 
 type class_rawexpr = [%import: Vernacexpr.class_rawexpr]
   [@@deriving sexp]
@@ -209,12 +211,6 @@ type module_binder =
 
 type typeclass_constraint =
   [%import: Vernacexpr.typeclass_constraint]
-  [@@deriving sexp]
-
-type vernac_flag_value =
-  [%import: Vernacexpr.vernac_flag_value]
-and vernac_flags =
-  [%import: Vernacexpr.vernac_flags]
   [@@deriving sexp]
 
 type vernac_expr           = [%import: Vernacexpr.vernac_expr]

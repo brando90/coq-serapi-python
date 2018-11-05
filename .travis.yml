@@ -25,11 +25,11 @@ env:
   - OPAMYES="true"
   - NJOBS="2"
   - COQ_REPOS="https://github.com/coq/coq.git"
-  - COQ_VERSION="v8.9"
-  - COQ_BRANCH="v8.9"
+  - COQ_VERSION="v8.10"
+  - COQ_BRANCH="master"
   - COQ_CONF="-local -native-compiler no -coqide no"
   - COMPILER="4.06.1"
-  - BASE_OPAM="camlp5 cmdliner ppx_deriving ppx_import ppx_sexp_conv sexplib dune"
+  - BASE_OPAM="cmdliner ppx_deriving ppx_import ppx_sexp_conv sexplib dune"
   # Main test suites
   matrix:
   # Don't test opam in 8.9 yet.

@@ -41,7 +41,6 @@ let create_document ~in_file ~async ~async_workers ~quick ~iload_path ~debug =
 
   let stm_options = process_stm_flags
       { enable_async  = async
-      ; async_full    = false
       ; deep_edits    = false
       ; async_workers = async_workers
       } in

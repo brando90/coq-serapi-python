@@ -1,3 +1,9 @@
+_Version 0.7.0_:
+
+ * [general] support Coq 8.10,
+ * [serapi] `Goals` query return type has been modified due to
+             upstream changes. (@ejgallego)
+
 _Version 0.6.0_:
 
  * [general] support Coq 8.9,
