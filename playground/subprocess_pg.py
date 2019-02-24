@@ -1,5 +1,18 @@
 import subprocess
 
+'''
+Goal:
+
+(Add () "Example test_oddb1: Nat.odd 1 = true.")
+(Exec 2)
+(Query () Goals)
+(Query ((pp((pp_format PpStr)))) Goals)
+(Add () "reflexivity.")
+(Exec 4)
+(Add () "Qed.")
+
+'''
+
 def simple():
     # Simple command
     #output = subprocess.call(['ls', '-1'], shell=True)
@@ -22,6 +35,9 @@ def popen_pg():
 
 
 def serapi_attempt1():
+    '''
+    https://stackoverflow.com/questions/16768290/understanding-popen-communicate
+    '''
     ##
     proc = subprocess.Popen(['sertop'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,)
     #proc = subprocess.Popen(['sertop'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,)
@@ -37,8 +53,27 @@ def serapi_attempt1():
     print(comm[1])
     print(type(comm[0]))
     ##
-    #stdout_value = proc.communicate()[0]
-    #print('\tstdout:', repr(stdout_value))
+    '''
+    (Add () "Example test_oddb1: Nat.odd 1 = true.")
+
+    (Answer 0 Ack)
+    (Answer 0(Added 2((fname ToplevelInput)(line_nb 1)(bol_pos 0)(line_nb_last 1)(bol_pos_last 0)(bp 0)(ep 37))NewTip))
+    (Answer 0 Completed)
+    '''
+    comm = proc.communicate('(Add () "Example test_oddb1: Nat.odd 1 = true.")')
+    print(comm)
+
+def serapi_continuous_communication():
+    '''
+    https://stackoverflow.com/questions/19880190/interactive-input-output-using-python
+    '''
+    #p = subprocess.Popen(['sertop'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,)
+    p = subprocess.Popen(['python'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,)
+    # get output from process "Something to print"
+    #one_line_output = p.stdout.readline()
+    #print(one_line_output)
+    for line in p.stdout:
+        print(line)
 
 def context_manager():
     with subprocess.Popen(['sertop'],stdout=subprocess.PIPE) as proc:
@@ -52,8 +87,7 @@ if __name__ == '__main__':
     #attempt1()
     #context_manager()
     #popen_pg()
-    serapi_attempt1()
+    #serapi_attempt1()
+    serapi_continuous_communication()
 
-#(Sys_error"Input/output error")
-##
 print('end of main')
