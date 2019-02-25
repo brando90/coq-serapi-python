@@ -13,6 +13,14 @@ Goal:
 
 '''
 
+def context_manager():
+    with subprocess.Popen(['sertop'],stdout=subprocess.PIPE) as proc:
+        print(f'type(proc)={type(proc)}')
+        print(f'proc={proc}')
+        #stdout_value = proc.communicate()[0]
+        #print('\tstdout:', repr(stdout_value))
+    return
+
 def simple():
     # Simple command
     #output = subprocess.call(['ls', '-1'], shell=True)
@@ -32,7 +40,6 @@ def popen_pg():
     ##
     stdout_value = proc.communicate()[0]
     print('\tstdout:', repr(stdout_value))
-
 
 def serapi_attempt1():
     '''
@@ -63,7 +70,7 @@ def serapi_attempt1():
     comm = proc.communicate('(Add () "Example test_oddb1: Nat.odd 1 = true.")')
     print(comm)
 
-def serapi_continuous_communication():
+def serapi_continuous_communication_not_work():
     '''
     https://stackoverflow.com/questions/19880190/interactive-input-output-using-python
     '''
@@ -75,12 +82,60 @@ def serapi_continuous_communication():
     for line in p.stdout:
         print(line)
 
-def context_manager():
-    with subprocess.Popen(['sertop'],stdout=subprocess.PIPE) as proc:
-        print(f'type(proc)={type(proc)}')
-        print(f'proc={proc}')
-        #stdout_value = proc.communicate()[0]
-        #print('\tstdout:', repr(stdout_value))
+def original_SO_example():
+    fw = open("tmpout", "wb")
+    fr = open("tmpout", "r")
+    p = Popen("./a.out", stdin = PIPE, stdout = fw, stderr = fw, bufsize = 1)
+    p.stdin.write("1\n")
+    out = fr.read()
+    p.stdin.write("5\n")
+    out = fr.read()
+    fw.close()
+    fr.close()
+
+def serapi_interactive_communication():
+    '''
+    TODO: make sure I can have interactivitity with SerAPI, send commands continuously
+
+    https://stackoverflow.com/questions/19880190/interactive-input-output-using-python
+    https://stackoverflow.com/questions/375427/non-blocking-read-on-a-subprocess-pipe-in-python/4896288#4896288
+    '''
+    fw = open("tmpout", "wb")
+    fr = open("tmpout", "r")
+    frw = open("tmpout", "r+")
+    #p = subprocess.Popen(['sertop'],stdin=subprocess.PIPE,stdout=fw,stderr=fw,)
+    p = subprocess.Popen(['sertop'],stdin=subprocess.PIPE,stdout=frw,stderr=frw,)
+    #p = subprocess.Popen(['python'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,)
+    #p = Popen("./a.out", stdin=PIPE, stdout=fw, stderr=fw, bufsize=1)
+    #p.stdin.write( bytes("(Add () \"Example test_oddb1: Nat.odd 1 = true.\")","utf-8") )
+    #p.stdin.write( bytes("(Add () \"Example test_oddb1: Nat.odd 1 = true.\")","utf-8") )
+    out = frw.readline()
+    print(out)
+    print(len(out))
+    print(type(out))
+    # p.stdin.write( "(Add () \"Example test_oddb1: Nat.odd 1 = true.\")" )
+    p.stdin.write( bytes("(Add () \"Example test_oddb1: Nat.odd 1 = true.\")", "utf-8") )
+    # out = fr.read()
+    # print(out)
+    # for line in fr:
+    #     print(line)
+    return
+
+def send_command_test():
+    '''
+    TODO: make sure I can send commands to SerAPI and confirm it in python
+
+    https://stackoverflow.com/questions/37601804/typeerror-string-argument-without-an-encoding-but-the-string-is-encoded?rq=1
+    '''
+    # make sure sending
+    p = subprocess.Popen(['sertop'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,)
+    #out = p.stdout.readline()
+    #print(out)
+    p.stdin.write( bytes("(Add () \"Example test_oddb1: Nat.odd 1 = true.\")", "utf-8") )
+    for line in p.stdout:
+        print('--- NEW LINE')
+        print(line)
+    return
 
 if __name__ == '__main__':
     print('running main')
@@ -88,6 +143,7 @@ if __name__ == '__main__':
     #context_manager()
     #popen_pg()
     #serapi_attempt1()
-    serapi_continuous_communication()
+    #serapi_interactive_communication()
+    send_command_test()
 
 print('end of main')
