@@ -100,11 +100,20 @@ def serapi_interactive_communication():
     https://stackoverflow.com/questions/19880190/interactive-input-output-using-python
     https://stackoverflow.com/questions/375427/non-blocking-read-on-a-subprocess-pipe-in-python/4896288#4896288
     '''
+    print('in  serapi_interactive_communication')
+    # import os
+    # try:
+    #     os.remove('a.out')
+    # except OSError:
+    #     pass
+    # f = open("a.out","w+")
+    ##
     fw = open("tmpout", "wb")
     fr = open("tmpout", "r")
     frw = open("tmpout", "r+")
-    #p = subprocess.Popen(['sertop'],stdin=subprocess.PIPE,stdout=fw,stderr=fw,)
-    p = subprocess.Popen(['sertop'],stdin=subprocess.PIPE,stdout=frw,stderr=frw,)
+    p = subprocess.Popen(['python'],stdin=subprocess.PIPE,stdout=fw,stderr=fw,)
+    #p = subprocess.Popen(['sertop'],stdin=subprocess.PIPE,stdout=frw,stderr=frw,)
+    #p = subprocess.Popen("/Users/brandomiranda/home_simulation_research/coq-serapi-python/playground/a.out", stdin = subprocess.PIPE, stdout = fw, stderr = fw, bufsize = 1)
     #p = subprocess.Popen(['python'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,)
     #p = Popen("./a.out", stdin=PIPE, stdout=fw, stderr=fw, bufsize=1)
     #p.stdin.write( bytes("(Add () \"Example test_oddb1: Nat.odd 1 = true.\")","utf-8") )
@@ -114,12 +123,30 @@ def serapi_interactive_communication():
     print(len(out))
     print(type(out))
     # p.stdin.write( "(Add () \"Example test_oddb1: Nat.odd 1 = true.\")" )
-    p.stdin.write( bytes("(Add () \"Example test_oddb1: Nat.odd 1 = true.\")", "utf-8") )
-    # out = fr.read()
-    # print(out)
+    #p.stdin.write( bytes("(Add () \"Example test_oddb1: Nat.odd 1 = true.\")", "utf-8") )
+    p.stdin.write(  bytes('print(1)', 'utf-8') )
+    out = fr.read()
+    print(out)
     # for line in fr:
     #     print(line)
     return
+
+def talk_to_python_interactively():
+    '''
+    https://stackoverflow.com/questions/19880190/interactive-input-output-using-python
+
+    https://gist.github.com/brando90/99b10cdc73dc6b604ca661712c1c7b0d
+    '''
+    fw = open("tmpout", "wb")
+    fr = open("tmpout", "r")
+    p = subprocess.Popen(['python'],stdin=subprocess.PIPE,stdout=fw,stderr=fw,)
+    out = frw.readline()
+    print(out)
+    print(len(out))
+    print(type(out))
+    p.stdin.write(  bytes('print(1)', 'utf-8') )
+    out = fr.read()
+    print(out) # prints nothing interesting
 
 def send_command_test():
     '''
@@ -143,7 +170,7 @@ if __name__ == '__main__':
     #context_manager()
     #popen_pg()
     #serapi_attempt1()
-    #serapi_interactive_communication()
-    send_command_test()
+    serapi_interactive_communication()
+    #send_command_test()
 
 print('end of main')
