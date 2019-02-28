@@ -176,13 +176,69 @@ def send_command_test():
         print(line)
     return
 
+def tutorial_example():
+    '''
+    https://eli.thegreenplace.net/2017/interacting-with-a-long-running-child-process-in-python/
+    '''
+    proc = subprocess.Popen(['python3', '-i'],
+                            stdin=subprocess.PIPE,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE)
+
+    # To avoid deadlocks: careful to: add \n to output, flush output, use
+    # readline() rather than read()
+    #proc.stdin.write(b'2+2\n')
+    proc.stdin.write(b'print(\'hello\')\n')
+    proc.stdin.flush()
+    print(proc.stdout.readline())
+
+    proc.stdin.write(b'len("foobar")\n')
+    proc.stdin.flush()
+    print(proc.stdout.readline())
+
+    proc.stdin.close()
+    proc.terminate()
+    proc.wait(timeout=0.2)
+    return
+
+def tutorial_example_to_serapi():
+    '''
+    https://eli.thegreenplace.net/2017/interacting-with-a-long-running-child-process-in-python/
+    To avoid deadlocks: careful to: add \n to output, flush output, use
+    readline() rather than read()
+    '''
+    proc = subprocess.Popen(['sertop'],
+                            stdin=subprocess.PIPE,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE)
+    ## remove the superflous part
+    for line in proc.stdout:
+        print('--- NEW LINE')
+        proc.stdin.flush()
+        print(line)
+    print('FINISHED PROCESSING THE FIRST MSG')
+    ## send command
+    proc.stdin.write(b'(Add () \"Example test_oddb1: Nat.odd 1 = true.\")\n')
+    proc.stdin.flush()
+    #print(proc.stdout.readline())
+    for line in proc.stdout:
+        print('--- NEW LINE')
+        print(line)
+    ##
+    proc.stdin.close()
+    proc.terminate()
+    proc.wait(timeout=0.2)
+    return
+
 if __name__ == '__main__':
     print('running main')
     #attempt1()
     #context_manager()
     #popen_pg()
     #serapi_attempt1()
-    serapi_interactive_communication()
+    #serapi_interactive_communication()
     #send_command_test()
+    #tutorial_example()
+    tutorial_example_to_serapi()
 
 print('end of main')
