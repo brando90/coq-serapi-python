@@ -99,6 +99,8 @@ def serapi_interactive_communication():
 
     https://stackoverflow.com/questions/19880190/interactive-input-output-using-python
     https://stackoverflow.com/questions/375427/non-blocking-read-on-a-subprocess-pipe-in-python/4896288#4896288
+
+    blocking readline: https://stackoverflow.com/questions/375427/non-blocking-read-on-a-subprocess-pipe-in-python/4896288#4896288
     '''
     print('in  serapi_interactive_communication')
     # import os
@@ -136,6 +138,16 @@ def talk_to_python_interactively():
     https://stackoverflow.com/questions/19880190/interactive-input-output-using-python
 
     https://gist.github.com/brando90/99b10cdc73dc6b604ca661712c1c7b0d
+
+    The interaction I want to implement:
+
+    -run process
+    then its in the background waiting for a command to be received
+    -then my script decides to send a command.
+    1) p.send_command(cmd)
+    then wait until the command is fully executed and the full response is written somewhere for the python script to read
+    2) output = p.read_fully_the_cmd_output()
+    then do stuff with output, repeat when the next time we need to execute a command
     '''
     fw = open("tmpout", "wb")
     fr = open("tmpout", "r")
