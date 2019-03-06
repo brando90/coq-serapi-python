@@ -28,34 +28,10 @@ Pseudo-code:
 -then do stuff with output, repeat when the next time we need to execute a command
 '''
 
-class SerapiAPI:
-    def __init__(self):
-        self.p = subprocess.Popen(['sertop'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        self._intro_msgs_list = self._load_intro_msg()
-
-    def _load_intro_msg(self):
-        file_read = open("tmpout", "r")
-        intro_msgs_list = []
-        for line in file_read:
-            self.intro_msg(line)
-        return intro_msgs_list
-
-    def process_intro_msg(self):
-        nb_elems_2_trim = len(_intro_msgs_list)
-        while nb_elems_2_trim > 0:
-            self.p.stdout.flush()
-            line = self.p.stdout.readline()
-            if line in _intro_msgs_list:
-                nb_elems_2_trim += -1
-
-    def do(self,cmd):
-        self.p.write(cmd)
-        self.p.stdin.flush()
-        #
-        return
-
 def make_sure_serapi_receives_command_fine():
     '''
+    WORKS
+
     first make sure that the command is received and we can make sure the
     command was received by checking the output (even if it deadlocks)
     '''
@@ -74,10 +50,12 @@ def make_sure_serapi_receives_command_fine():
 
 def make_sure_serapi_receives_command_fine_NO_DEADLOCK_Queue_Soln():
     '''
-    TODO: fix deadlock
+    TODO: fix deadlock, this still doesn't work, I can't see any output for some reason, despite me trying to flush it
 
-    by continuously reading from Queue
+    by continuously reading from Queue.
+    https://stackoverflow.com/questions/375427/non-blocking-read-on-a-subprocess-pipe-in-python
     '''
+    print('make_sure_serapi_receives_command_fine_NO_DEADLOCK_Queue_Soln')
     ##
     # sertop = SerapiAPI()
     # sertop.process_intro_msg()
@@ -101,9 +79,14 @@ def make_sure_serapi_receives_command_fine_NO_DEADLOCK_Queue_Soln():
         for line in iter(out.readline, b''):
             queue.put(line)
         out.close()
+        ##
+        # while True: # while there are new lines to read put them in the queue
+        #     out.flush()
+        #     line = out.readline()
+        #     queue.put(line)
         return
     ##
-    p = Popen(['sertop'], stdout=PIPE,stdin=PIPE,stderr=PIPE, bufsize=1, close_fds=ON_POSIX)
+    p = Popen(['sertop'], stdout=PIPE,stdin=PIPE,stderr=PIPE, close_fds=ON_POSIX)
     q = Queue()
     # TODO: when is p.stdout.flush being called...?
     t = Thread(target=enqueue_output, args=(p.stdout, q))
@@ -111,27 +94,41 @@ def make_sure_serapi_receives_command_fine_NO_DEADLOCK_Queue_Soln():
     t.start()
     # trim the beginning
     trimming = True
-    line = q.get_nowait()
     while trimming:
         try:
             line = q.get_nowait() # or q.get(timeout=.1)
+            print(f'line={line}')
         except Empty:
             trimming = False
     # read the new command sent to sertop
-    proc.stdin.write(b'(Add () \"Example test_oddb1: Nat.odd 1 = true.\")\n')
-    proc.stdin.flush()
-    print(f'output from ADD command: line={q.get_nowait()}')
+    #p.stdin.write(b'(Add () \"Example test_oddb1: Nat.odd 1 = true.\")\n')
+    #p.stdin.flush()
+    #print(f'output from ADD command: line={q.get_nowait()}')
+    return
 
-def make_sure_serapi_receives_command_fine_NO_DEADLOCK_Queue_Soln():
+def make_sure_serapi_receives_command_fine_NO_DEADLOCK():
     '''
     TODO: fix deadlock
 
     by just reading until the command response is done
     '''
-    p = Popen(['sertop'], stdout=PIPE,stdout=PIPE,stderr=PIPE, bufsize=1, close_fds=ON_POSIX)
-    ## TODO
+    #
+    p = subprocess.Popen(['sertop'],
+                                stdin=subprocess.PIPE,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE)
+    # send command to sertop
+    p.stdin.write(b'(Add () \"Example test_oddb1: Nat.odd 1 = true.\")\n')
+    p.stdin.flush() # I think it pushes things to the actual file rather than keep it in buffer
+    ##
+    reading_command = True
+    while reading_command: # while reading for completed command
+        line = str(p.stdout.readline())
+        print(line)
+        reading_command = not ('Completed' in line) # if completed then we don't need to keep reading
 
 if __name__ == '__main__':
     print('Running main')
-    #make_sure_serapi_receives_command_fine()
-    make_sure_serapi_receives_command_fine_NO_DEADLOCK_Queue_Soln()
+    #make_sure_serapi_receives_command_fine() ## PASSED
+    #make_sure_serapi_receives_command_fine_NO_DEADLOCK_Queue_Soln() ## TODO
+    make_sure_serapi_receives_command_fine_NO_DEADLOCK()

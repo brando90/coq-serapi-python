@@ -1,10 +1,14 @@
-sertop
+sertop --no_init
+## The feedback you see when starting sertop is because SerAPI does a NewDoc
+## command internally. So if you use --no_init, this feedback is suppressed, and
+## you can work in the model where no unexpected feedback is received.
 
+---- Untagged Version ----
 ---
 (Add () "Example test_oddb1: Nat.odd 1 = true.")
 
 (Answer 0 Ack)
-(Answer 0(Added 2((fname ToplevelInput)(line_nb 1)(bol_pos 0)(line_nb_last 1)(bol_pos_last 0)(bp 0)(ep 37))NewTip))
+(Answer 0(CoqExn()()(Backtrace())(NoSuchState 0)))
 (Answer 0 Completed)
 ---
 (Exec 0)
@@ -48,3 +52,12 @@ sertop
 
 (Answer 7 Ack)
 (Answer 7(CoqExn()()(Backtrace())(Stm.Vcs_aux.Expired)))
+
+
+
+---- tagged Version ---- TODO
+( tag1 (Add () "Example test_oddb1: Nat.odd 1 = true.") )
+
+(Answer tag1 Ack)
+(Answer tag1(CoqExn()()(Backtrace())(NoSuchState 0)))
+(Answer tag1 Completed)
