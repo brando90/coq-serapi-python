@@ -112,15 +112,13 @@ def make_sure_serapi_receives_command_fine_NO_DEADLOCK():
 
     by just reading until the command response is done
     '''
-    #
-    p = subprocess.Popen(['sertop'],
-                                stdin=subprocess.PIPE,
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE)
-    # send command to sertop
-    p.stdin.write(b'(Add () \"Example test_oddb1: Nat.odd 1 = true.\")\n')
-    p.stdin.flush() # I think it pushes things to the actual file rather than keep it in buffer
     ##
+    #p = subprocess.Popen(['sertop'], stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    p = subprocess.Popen(['sertop','--no_init'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    ## send command to sertop
+    p.stdin.write(b'(Add () \"Example test_oddb1: Nat.odd 1 = true.\")\n')
+    p.stdin.flush() # it pushes things to the actual file rather than keep it in the buffer
+    ## process command
     reading_command = True
     while reading_command: # while reading for completed command
         line = str(p.stdout.readline())

@@ -149,7 +149,7 @@ def train(policy,optimizer,env,gamma,nb_episodes=1000,time_steps=1000,ema_alpha=
                 env.render()
             policy.episode_rewards.append(reward)
             ep_return += reward
-            if done:
+            if done: # whether it’s time to reset the environment again. Most (but not all) tasks are divided up into well-defined episodes, and done being True indicates the episode has terminated.
                 break
         running_return = ema_alpha * ep_return + (1 - ema_alpha) * running_return
         finish_episode(policy,optimizer, gamma)
@@ -184,4 +184,3 @@ if __name__ == '__main__':
     print('--- DONE TRAINING')
     if args.plot:
         my_plt.plot(policy)
-
