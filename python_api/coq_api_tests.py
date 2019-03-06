@@ -2,11 +2,12 @@ import unittest
 
 import coq_api
 
+# TODO: sort of ugly?
+debug = False
+coq = coq_api.Coq(debug)
+
 class TestStringMethods(unittest.TestCase):
     # example test: https://github.com/brando90/eit_proj1/blob/master/main_proj_lib/tests/test_user_implemented.py
-
-    def __init__(self):
-        self.coq = coq_api.coq()
 
     def test_add(self):
         '''
@@ -18,8 +19,15 @@ class TestStringMethods(unittest.TestCase):
         (Answer 0(CoqExn()()(Backtrace())(NoSuchState 0)))
         (Answer 0 Completed)
         '''
-        self.coq.add("Example test_oddb1: Nat.odd 1 = true.")
-        self.assertEqual('foo'.upper(), 'FOO')
+        answer = [b'(Answer 0 Ack)\n',
+            b'(Answer 0(CoqExn()()(Backtrace())(NoSuchState 0)))\n',
+            b'(Answer 0 Completed)\n']
+        result = coq.add("Example test_oddb1: Nat.odd 1 = true.")
+        for i, current_result_sexpt in enumerate(result):
+            print(current_result_sexpt)
+            print(answer[i])
+            self.assertEqual(str(current_result_sexpt), str(answer[i]))
+            #self.assertEqual(current_result_sexpt, answer[i])
 
     def test_tagged_add(self):
         '''

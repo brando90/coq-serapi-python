@@ -18,40 +18,50 @@ class Coq:
         self._send_command(cmd)
         ## get results of command
         results = self._get_results()
-        return
+        return results
+
+    ## COMMANDS: https://github.com/brando90/coq-serapi-python/blob/d394050372b6ab680fda2680d6e4ba53fdabb875/serapi/serapi_protocol.mli#L212
 
     def new_doc(self, cmd):
         return
 
-    def add(self, cmd, tag=None):
+    def add(self, text, tag=None):
+        '''
+        '''
         cmd = f"( Add () \"{text}\")"
         if tag:
             cmd = add_tag(cmd)
         ##
         result = self.run_command(cmd)
-        return
+        return result
 
-    def _send_command(cmd):
+    def _send_command(self,cmd):
         '''
+
+        e.g.
+            p.stdin.write(b'(Add () \"Example test_oddb1: Nat.odd 1 = true.\")\n')
+            p.stdin.flush() # it pushes things to the actual file rather than keep it in the buffer
         '''
-        self.stdin.write(cmd)
-        self.stdin.flush(cmd)
+        cmd = bytes(cmd,'utf-8')
+        #print(f'cmd={cmd}')
+        self.serapi.stdin.write(cmd)
+        self.serapi.stdin.flush()
 
     def _get_results(self):
         '''
         '''
         ## process result of command
         completed_getting_results = False
-        results = []
+        result = []
         while not completed_getting_results: # while searching for completed tag command
             line = self.serapi.stdout.readline()
             if self.debug:
-                print(f'line={line}')
-            current_result = pythonize_sexpt(sexpt=line)
-            results.append(current_result)
+                print(f'-> line={line}')
+            current_result_sexpt = pythonize_sexpt(sexpt=line)
+            result.append(current_result_sexpt)
             ## if complete tag found then we don't need to keep reading from serapi
-            completed_getting_results = 'Completed' in line
-        return results
+            completed_getting_results = "Completed" in str(line)
+        return result
 
 ## utils
 
@@ -63,5 +73,3 @@ def pythonize_sexpt(sexpt):
         TODO: convert sexpt to python object
     '''
     return str(sexpt)
-
-if __name__ == '__main__':
