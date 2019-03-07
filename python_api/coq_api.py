@@ -1,3 +1,5 @@
+import os
+import signal
 import subprocess
 
 import pdb
@@ -17,8 +19,20 @@ class Coq:
             debug (bool): True when in debugging state.
         '''
         ## start serapi, TODO: --no_init flag, think about how to use feedback for ML better
-        self.serapi = subprocess.Popen(['sertop','--no_init'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        self.serapi = subprocess.Popen(['sertop','--no_init'],
+            stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,
+            preexec_fn=os.setsid,shell=True
+            ,)
         self.debug = debug
+        print(self.serapi.pid)
+
+    def kill(self):
+        ''' Kills the Coq process (serapi).
+        '''
+        # https://docs.python.org/2/library/subprocess.html#subprocess.Popen.kill
+        #self.serapi.kill()
+        #self.serapi.terminate()
+        os.killpg(os.getpgid(self.serapi.pid), signal.SIGTERM)
 
     def run_command(self, cmd):
         ''' Runs the raw command command cmd given.
@@ -34,11 +48,14 @@ class Coq:
 
     ## COMMANDS: https://github.com/brando90/coq-serapi-python/blob/d394050372b6ab680fda2680d6e4ba53fdabb875/serapi/serapi_protocol.mli#L212
 
-    def new_doc(self, cmd):
+    def new_doc(self,doc_name):
         '''
-        TODO
+        TODO: NewDoc has many parameters, need to figure out what they are and
+        put them here.
         '''
-        return
+        cmd = f'(NewDoc ((top_name (TopPhysical \"{doc_name}\"))))'
+        result = self.run_command(cmd)
+        return result
 
     def add(self, text, tag=None):
         ''' Executes the Add command with the given text (and tag).
@@ -48,9 +65,9 @@ class Coq:
             tag (text): text for tag.
         '''
         cmd = f"( Add () \"{text}\")"
-        if tag:
-            cmd = add_tag(cmd)
-        ##
+        ## tag command if tag present, else leave as is
+        cmd = add_tag(cmd) if tag else cmd
+        ## get result from serapi when running command
         result = self.run_command(cmd)
         return result
 
