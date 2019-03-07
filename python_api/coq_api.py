@@ -67,7 +67,7 @@ class Coq:
         self.serapi.stdin.flush()
 
     def _get_result(self):
-        ''' Get the result from the last command exectued.
+        ''' Get the result from the last command executed.
 
         Args:
             result (list): list of s-expressions from the command result.
@@ -101,5 +101,10 @@ def add_tag(tag,cmd):
 def pythonize_sexpt(sexpt):
     '''
         TODO: convert sexpt to python object
+
+        https://github.com/ocaml-ppx/ppx_deriving_yojson
     '''
-    return str(sexpt)
+    pythonixed_sexpt = str(sexpt)
+    ##
+
+    return pythonixed_sexpt
