@@ -24,15 +24,18 @@ class Coq:
             preexec_fn=os.setsid,shell=True
             ,)
         self.debug = debug
-        print(self.serapi.pid)
 
     def kill(self):
         ''' Kills the Coq process (serapi).
+
+        TODO
         '''
         # https://docs.python.org/2/library/subprocess.html#subprocess.Popen.kill
-        #self.serapi.kill()
-        #self.serapi.terminate()
-        os.killpg(os.getpgid(self.serapi.pid), signal.SIGTERM)
+        #self.serapi.wait()
+        self.serapi.kill()
+        self.serapi.terminate()
+        #os.killpg(os.getpgid(self.serapi.pid), signal.SIGTERM)
+        self.serapi.wait()
 
     def run_command(self, cmd):
         ''' Runs the raw command command cmd given.
