@@ -12,6 +12,9 @@ class TestStringMethods(unittest.TestCase):
     def test_kill(self):
         '''
         TODO
+
+        https://stackoverflow.com/questions/55052055/why-do-i-get-subprocess-resource-warnings-despite-the-process-being-dead
+        https://stackoverflow.com/questions/4789837/how-to-terminate-a-python-subprocess-launched-with-shell-true
         '''
         coq.kill()
         self.assertEqual(True,True) # TODO
@@ -90,6 +93,35 @@ class TestStringMethods(unittest.TestCase):
                 print(answer[i])
             self.assertEqual(str(current_result_sexpt), str(answer[i]))
 
+    def test_run_command(self):
+        '''
+        TODO
+        '''
+        #coq.run_command()
+        self.assertEqual(True,True) # TODO
+
+
+    def test_simple_proof(self):
+        '''
+
+        (NewDoc ((top_name (TopPhysical "foo.v"))))
+        (Add () "Example test_oddb1: Nat.odd 1 = true.")
+        (Add () "reflexivity.")
+        (Add () "Qed.")
+        (Exec 2)
+        '''
+        result = coq.new_doc("bar.v")
+        ##
+        result = coq.add("Example test_oddb1: Nat.odd 1 = true.")
+        result = coq.add("reflexivity.")
+        result = coq.add("Qed.")
+        result = coq.exec(2)
+        ## test
+        for i, current_result_sexpt in enumerate(result):
+            if DEBUG:
+                print(current_result_sexpt)
+                print(answer[i])
+            self.assertEqual(str(current_result_sexpt), str(answer[i]))
 
 if __name__ == '__main__':
     unittest.main()
