@@ -19,6 +19,9 @@ class Coq:
             debug (bool): True when in debugging state.
         '''
         ## start serapi, TODO: --no_init flag, think about how to use feedback for ML better
+        serapi_cmd = ['sertop','--no_init']
+        if debug:
+            print(f'serapi_cmd = {serapi_cmd}')
         self.serapi = subprocess.Popen(['sertop','--no_init'],
             stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,
             preexec_fn=os.setsid,shell=True
@@ -28,7 +31,9 @@ class Coq:
     def kill(self):
         ''' Kills the Coq process (serapi).
 
-        TODO
+        TODO:
+        https://stackoverflow.com/questions/55052055/why-do-i-get-subprocess-resource-warnings-despite-the-process-being-dead
+        https://stackoverflow.com/questions/4789837/how-to-terminate-a-python-subprocess-launched-with-shell-true
         '''
         # https://docs.python.org/2/library/subprocess.html#subprocess.Popen.kill
         #self.serapi.wait()
@@ -45,7 +50,7 @@ class Coq:
         '''
         ## send command fully to serapi
         self._send_command(cmd)
-        print('command sent successfully')
+        #print('command sent successfully')
         ## get results of command
         result = self._get_result()
         return result
@@ -132,6 +137,7 @@ class Coq:
             result.append(current_result_sexpt)
             ## if complete tag found then we don't need to keep reading from serapi
             completed_getting_results = "Completed" in str(line)
+        print(len(result))
         return result
 
 ## utils
@@ -154,5 +160,4 @@ def pythonize_sexpt(sexpt):
     '''
     pythonixed_sexpt = str(sexpt)
     ##
-
     return pythonixed_sexpt

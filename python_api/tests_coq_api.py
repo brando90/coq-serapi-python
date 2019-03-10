@@ -13,8 +13,7 @@ class TestStringMethods(unittest.TestCase):
 
     def test_kill(self):
         '''
-        TODO
-
+        TODO:
         https://stackoverflow.com/questions/55052055/why-do-i-get-subprocess-resource-warnings-despite-the-process-being-dead
         https://stackoverflow.com/questions/4789837/how-to-terminate-a-python-subprocess-launched-with-shell-true
         '''
@@ -167,7 +166,8 @@ class TestStringMethods(unittest.TestCase):
         ])
         ## make full document in Python
         results = [] # results from each command sent to Coq
-        result = coq.new_doc("bar.v")
+        result = coq.new_doc("foo.v")
+        pdb.set_trace()
         print('here1')
         results.append(result)
         result = coq.add("Example test_oddb1: Nat.odd 1 = true.")
@@ -196,4 +196,5 @@ class TestStringMethods(unittest.TestCase):
                 self.assertEqual(str(current_result_sexpt), str(answer[i]))
 
 if __name__ == '__main__':
+    print('running main in TESTS')
     unittest.main()
