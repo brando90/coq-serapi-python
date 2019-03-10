@@ -1,6 +1,9 @@
 import unittest
+from sexpdata import loads, dumps
 
 import coq_api
+
+import time
 
 import pdb
 from pdb import set_trace as st
@@ -159,13 +162,13 @@ class TestStringMethods(unittest.TestCase):
         ])
         # coq.exec(2)
         answers.append([
-        '(Answer 4 Ack)\n',
-        '(Feedback((doc_id 0)(span_id 3)(route 0)(contents(ProcessingIn master))))\n',
-        '(Feedback((doc_id 0)(span_id 2)(route 0)(contents(ProcessingIn master))))\n',
-        '(Feedback((doc_id 0)(span_id 1)(route 0)(contents Processed)))\n',
-        '(Feedback((doc_id 0)(span_id 2)(route 0)(contents Processed)))\n',
-        '(Feedback((doc_id 0)(span_id 3)(route 0)(contents Processed)))\n',
-        '(Answer 4 Completed)\n'
+        b'(Answer 4 Ack)\n',
+        b'(Feedback((doc_id 0)(span_id 3)(route 0)(contents(ProcessingIn master))))\n',
+        b'(Feedback((doc_id 0)(span_id 2)(route 0)(contents(ProcessingIn master))))\n',
+        b'(Feedback((doc_id 0)(span_id 1)(route 0)(contents Processed)))\n',
+        b'(Feedback((doc_id 0)(span_id 2)(route 0)(contents Processed)))\n',
+        b'(Feedback((doc_id 0)(span_id 3)(route 0)(contents Processed)))\n',
+        b'(Answer 4 Completed)\n'
         ])
         ## make full document in Python
         results = [] # results from each command sent to Coq
@@ -177,11 +180,13 @@ class TestStringMethods(unittest.TestCase):
         results.append(result)
         result = coq.add("Qed.")
         results.append(result)
-        result = coq.exec(4) # change this hardcode
+        result = coq.exec(3) # change this hardcode
         results.append(result)
+        st()
         self.assertEqual(len(results),len(answers))
         ## check results pass tests
-        print('\n---')
+        time.sleep(2)
+        print('\n--------------\n')
         for i in range(len(results)):
             print(f'--\ni={i}')
             result = results[i]

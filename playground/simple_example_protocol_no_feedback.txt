@@ -72,8 +72,64 @@ sertop --no_init
 
 
 ---- tagged Version ---- TODO
+
+---
 ( tag1 (Add () "Example test_oddb1: Nat.odd 1 = true.") )
 
 (Answer tag1 Ack)
 (Answer tag1(CoqExn()()(Backtrace())(NoSuchState 0)))
 (Answer tag1 Completed)
+
+
+
+
+
+
+
+--- minimal version ---
+(NewDoc ((top_name (TopPhysical "foo.v"))))
+
+(Answer 0 Ack)
+(Feedback((doc_id 0)(span_id 0)(route 0)(contents(FileLoaded Coq.Init.Prelude /Users/brandomiranda/.opam/4.06.0/lib/coq/theories/Init/Prelude.vo))))
+(Feedback((doc_id 0)(span_id 0)(route 0)(contents(FileLoaded Coq.Init.Notations /Users/brandomiranda/.opam/4.06.0/lib/coq/theories/Init/Notations.vo))))
+(Feedback((doc_id 0)(span_id 0)(route 0)(contents(FileLoaded Coq.Init.Logic /Users/brandomiranda/.opam/4.06.0/lib/coq/theories/Init/Logic.vo))))
+(Feedback((doc_id 0)(span_id 0)(route 0)(contents(FileLoaded Coq.Init.Datatypes /Users/brandomiranda/.opam/4.06.0/lib/coq/theories/Init/Datatypes.vo))))
+(Feedback((doc_id 0)(span_id 0)(route 0)(contents(FileLoaded Coq.Init.Logic_Type /Users/brandomiranda/.opam/4.06.0/lib/coq/theories/Init/Logic_Type.vo))))
+(Feedback((doc_id 0)(span_id 0)(route 0)(contents(FileLoaded Coq.Init.Specif /Users/brandomiranda/.opam/4.06.0/lib/coq/theories/Init/Specif.vo))))
+(Feedback((doc_id 0)(span_id 0)(route 0)(contents(FileLoaded Coq.Init.Decimal /Users/brandomiranda/.opam/4.06.0/lib/coq/theories/Init/Decimal.vo))))
+(Feedback((doc_id 0)(span_id 0)(route 0)(contents(FileLoaded Coq.Init.Nat /Users/brandomiranda/.opam/4.06.0/lib/coq/theories/Init/Nat.vo))))
+(Feedback((doc_id 0)(span_id 0)(route 0)(contents(FileLoaded Coq.Init.Peano /Users/brandomiranda/.opam/4.06.0/lib/coq/theories/Init/Peano.vo))))
+(Feedback((doc_id 0)(span_id 0)(route 0)(contents(FileLoaded Coq.Init.Wf /Users/brandomiranda/.opam/4.06.0/lib/coq/theories/Init/Wf.vo))))
+(Feedback((doc_id 0)(span_id 0)(route 0)(contents(FileLoaded Coq.Init.Tactics /Users/brandomiranda/.opam/4.06.0/lib/coq/theories/Init/Tactics.vo))))
+(Feedback((doc_id 0)(span_id 0)(route 0)(contents(FileLoaded Coq.Init.Tauto /Users/brandomiranda/.opam/4.06.0/lib/coq/theories/Init/Tauto.vo))))
+(Feedback((doc_id 0)(span_id 1)(route 0)(contents(ProcessingIn master))))
+(Feedback((doc_id 0)(span_id 1)(route 0)(contents Processed)))
+(Answer 0 Completed)
+---
+(Add () "Example test_oddb1: Nat.odd 1 = true.")
+
+(Answer 1 Ack)
+(Answer 1(Added 2((fname ToplevelInput)(line_nb 1)(bol_pos 0)(line_nb_last 1)(bol_pos_last 0)(bp 0)(ep 37))NewTip))
+(Answer 1 Completed)
+---
+(Add () "reflexivity.")
+
+(Answer 2 Ack)
+(Answer 2(Added 3((fname ToplevelInput)(line_nb 1)(bol_pos 0)(line_nb_last 1)(bol_pos_last 0)(bp 0)(ep 12))NewTip))
+(Answer 2 Completed)
+---
+(Add () "Qed.")
+
+(Answer 3 Ack)
+(Answer 3(Added 4((fname ToplevelInput)(line_nb 1)(bol_pos 0)(line_nb_last 1)(bol_pos_last 0)(bp 0)(ep 4))NewTip))
+(Answer 3 Completed)
+----
+(Exec 3)
+
+(Answer 4 Ack)
+(Feedback((doc_id 0)(span_id 3)(route 0)(contents(ProcessingIn master))))
+(Feedback((doc_id 0)(span_id 2)(route 0)(contents(ProcessingIn master))))
+(Feedback((doc_id 0)(span_id 1)(route 0)(contents Processed)))
+(Feedback((doc_id 0)(span_id 2)(route 0)(contents Processed)))
+(Feedback((doc_id 0)(span_id 3)(route 0)(contents Processed)))
+(Answer 4 Completed)

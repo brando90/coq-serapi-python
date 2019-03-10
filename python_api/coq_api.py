@@ -93,7 +93,6 @@ class Coq:
             tag (str/int): tag for Coq proof script
         '''
         cmd = f'( Exec {tag} )'
-        cmd = add_tag(tag,cmd) if tag else cmd # tag command if tag present, else leave as is
         result = self.run_command(cmd) # get result from serapi when running command
         return result
 
