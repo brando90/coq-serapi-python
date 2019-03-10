@@ -10,7 +10,7 @@ from pdb import set_trace as st
 
 print(f'running TOP tests_coq_api SCRIPT')
 # TODO: sort of ugly?
-DEBUG = True
+DEBUG = False
 coq = coq_api.Coq(DEBUG)
 
 class TestStringMethods(unittest.TestCase):
@@ -182,31 +182,25 @@ class TestStringMethods(unittest.TestCase):
         results.append(result)
         result = coq.exec(3) # change this hardcode
         results.append(result)
-        st()
         self.assertEqual(len(results),len(answers))
         ## check results pass tests
-        time.sleep(2)
         print('\n--------------\n')
         for i in range(len(results)):
-            print(f'--\ni={i}')
             result = results[i]
             answer = answers[i] #current answer for current command
-            print(result)
-            print(answer)
-            print(len(result))
-            print(len(answer))
-            #st()
+            if DEBUG:
+                print(f'--\ni={i}')
+                print(result)
+                print(answer)
+                print(len(result))
+                print(len(answer))
             for j in range(len(result)):
                 current_result_sexpt = result[j]
                 answer_j = answer[j]
-                print(current_result_sexpt)
-                print(answer_j)
-                #st()
                 if DEBUG:
                     print(current_result_sexpt)
                     print(answer_j)
                 self.assertEqual(str(current_result_sexpt), str(answer_j))
-            print(i)
 
 if __name__ == '__main__':
     print('running main in TESTS')
