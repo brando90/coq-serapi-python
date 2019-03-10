@@ -110,18 +110,73 @@ class TestStringMethods(unittest.TestCase):
         (Add () "Qed.")
         (Exec 2)
         '''
+        answers = []
+        # coq.new_doc("bar.v")
+        answers.append([
+            b'(Answer 0 Ack)\n',
+            b'(Feedback((doc_id 0)(span_id 0)(route 0)(contents(FileLoaded Coq.Init.Prelude /Users/brandomiranda/.opam/4.06.0/lib/coq/theories/Init/Prelude.vo))))\n',
+            b'(Feedback((doc_id 0)(span_id 0)(route 0)(contents(FileLoaded Coq.Init.Notations /Users/brandomiranda/.opam/4.06.0/lib/coq/theories/Init/Notations.vo))))\n',
+            b'(Feedback((doc_id 0)(span_id 0)(route 0)(contents(FileLoaded Coq.Init.Logic /Users/brandomiranda/.opam/4.06.0/lib/coq/theories/Init/Logic.vo))))\n',
+            b'(Feedback((doc_id 0)(span_id 0)(route 0)(contents(FileLoaded Coq.Init.Datatypes /Users/brandomiranda/.opam/4.06.0/lib/coq/theories/Init/Datatypes.vo))))\n',
+            b'(Feedback((doc_id 0)(span_id 0)(route 0)(contents(FileLoaded Coq.Init.Logic_Type /Users/brandomiranda/.opam/4.06.0/lib/coq/theories/Init/Logic_Type.vo))))\n',
+            b'(Feedback((doc_id 0)(span_id 0)(route 0)(contents(FileLoaded Coq.Init.Specif /Users/brandomiranda/.opam/4.06.0/lib/coq/theories/Init/Specif.vo))))\n',
+            b'(Feedback((doc_id 0)(span_id 0)(route 0)(contents(FileLoaded Coq.Init.Decimal /Users/brandomiranda/.opam/4.06.0/lib/coq/theories/Init/Decimal.vo))))\n',
+            b'(Feedback((doc_id 0)(span_id 0)(route 0)(contents(FileLoaded Coq.Init.Nat /Users/brandomiranda/.opam/4.06.0/lib/coq/theories/Init/Nat.vo))))\n',
+            b'(Feedback((doc_id 0)(span_id 0)(route 0)(contents(FileLoaded Coq.Init.Peano /Users/brandomiranda/.opam/4.06.0/lib/coq/theories/Init/Peano.vo))))\n',
+            b'(Feedback((doc_id 0)(span_id 0)(route 0)(contents(FileLoaded Coq.Init.Wf /Users/brandomiranda/.opam/4.06.0/lib/coq/theories/Init/Wf.vo))))\n',
+            b'(Feedback((doc_id 0)(span_id 0)(route 0)(contents(FileLoaded Coq.Init.Tactics /Users/brandomiranda/.opam/4.06.0/lib/coq/theories/Init/Tactics.vo))))\n',
+            b'(Feedback((doc_id 0)(span_id 0)(route 0)(contents(FileLoaded Coq.Init.Tauto /Users/brandomiranda/.opam/4.06.0/lib/coq/theories/Init/Tauto.vo))))\n',
+            b'(Feedback((doc_id 0)(span_id 1)(route 0)(contents(ProcessingIn master))))\n',
+            b'(Feedback((doc_id 0)(span_id 1)(route 0)(contents Processed)))\n',
+            b'(Answer 0 Completed)\n'
+        ] )
+        # coq.add("Example test_oddb1: Nat.odd 1 = true.")
+        answers.append([
+            b'(Answer 1 Ack)\n',
+            b'(Answer 1(Added 2((fname ToplevelInput)(line_nb 1)(bol_pos 0)(line_nb_last 1)(bol_pos_last 0)(bp 0)(ep 37))NewTip))\n',
+            b'(Answer 1 Completed)\n'
+        ] )
+        # coq.add("reflexivity.")
+        answers.append([
+            b'(Answer 2 Ack)\n',
+            b'(Answer 2(Added 3((fname ToplevelInput)(line_nb 1)(bol_pos 0)(line_nb_last 1)(bol_pos_last 0)(bp 0)(ep 12))NewTip))\n',
+            b'(Answer 2 Completed)\n'
+        ])
+        # coq.add("Qed.")
+        answers.append([
+        b'(Answer 3 Ack)\n'
+        b'(Answer 3(Added 4((fname ToplevelInput)(line_nb 1)(bol_pos 0)(line_nb_last 1)(bol_pos_last 0)(bp 0)(ep 4))NewTip))\n',
+        b'(Answer 3 Completed)\n'
+        ])
+        # coq.exec(2)
+        answers.append([
+        '(Answer 4 Ack)\n',
+        '(Feedback((doc_id 0)(span_id 3)(route 0)(contents(ProcessingIn master))))\n',
+        '(Feedback((doc_id 0)(span_id 2)(route 0)(contents(ProcessingIn master))))\n',
+        '(Feedback((doc_id 0)(span_id 1)(route 0)(contents Processed)))\n',
+        '(Feedback((doc_id 0)(span_id 2)(route 0)(contents Processed)))\n',
+        '(Feedback((doc_id 0)(span_id 3)(route 0)(contents Processed)))\n',
+        '(Answer 4 Completed)\n'
+        ])
+        ## make full document in Python
+        results = [] # results from each command sent to Coq
         result = coq.new_doc("bar.v")
-        ##
+        results.append(result)
         result = coq.add("Example test_oddb1: Nat.odd 1 = true.")
+        results.append(result)
         result = coq.add("reflexivity.")
+        results.append(result)
         result = coq.add("Qed.")
+        results.append(result)
         result = coq.exec(2)
-        ## test
-        for i, current_result_sexpt in enumerate(result):
-            if DEBUG:
-                print(current_result_sexpt)
-                print(answer[i])
-            self.assertEqual(str(current_result_sexpt), str(answer[i]))
+        results.append(result)
+        ## check results pass tests
+        for result in results:
+            for i, current_result_sexpt in enumerate(result):
+                if DEBUG:
+                    print(current_result_sexpt)
+                    print(answer[i])
+                self.assertEqual(str(current_result_sexpt), str(answer[i]))
 
 if __name__ == '__main__':
     unittest.main()
