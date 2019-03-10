@@ -45,6 +45,7 @@ class Coq:
         '''
         ## send command fully to serapi
         self._send_command(cmd)
+        print('command sent successfully')
         ## get results of command
         result = self._get_result()
         return result
@@ -56,8 +57,8 @@ class Coq:
         TODO: NewDoc has many parameters, need to figure out what they are and
         put them here.
         '''
-        cmd = f'(NewDoc ((top_name (TopPhysical \"{doc_name}\"))))'
-        result = self.run_command(cmd)
+        cmd = f'(NewDoc ((top_name (TopPhysical \"{doc_name}\"))))' ## compose command
+        result = self.run_command(cmd) # get result from serapi when running command
         return result
 
     def add(self, text, tag=None):
@@ -67,12 +68,39 @@ class Coq:
             text (str): text for Coq proof script.
             tag (text): text for tag.
         '''
-        cmd = f"( Add () \"{text}\")"
-        ## tag command if tag present, else leave as is
-        cmd = add_tag(cmd) if tag else cmd
-        ## get result from serapi when running command
-        result = self.run_command(cmd)
+        cmd = f'( Add () \"{text}\")' # compose command
+        cmd = add_tag(tag,cmd) if tag else cmd # tag command if tag present, else leave as is
+        result = self.run_command(cmd) # get result from serapi when running command
         return result
+
+    def cancel(self):
+        '''
+        TODO
+        '''
+        return
+
+    def exec(self,tag):
+        ''' Executes the verification of Coq script up to the tag given.
+
+        Args:
+            tag (str/int): tag for Coq proof script
+        '''
+        cmd = f'( Exec {tag} )'
+        cmd = add_tag(tag,cmd) if tag else cmd # tag command if tag present, else leave as is
+        result = self.run_command(cmd) # get result from serapi when running command
+        return result
+
+    def query(self):
+        '''
+        TODO
+        '''
+        return
+
+    def print(self):
+        '''
+        TODO
+        '''
+        return
 
     def _send_command(self,cmd):
         ''' Sends command to be executed to serapi.
