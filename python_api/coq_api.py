@@ -2,6 +2,8 @@ import os
 import signal
 import subprocess
 
+#import time
+
 import pdb
 
 class Coq:
@@ -22,9 +24,8 @@ class Coq:
         serapi_cmd = ['sertop','--no_init']
         if debug:
             print(f'serapi_cmd = {serapi_cmd}')
-        self.serapi = subprocess.Popen(['sertop','--no_init'],
-            stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,
-            preexec_fn=os.setsid,shell=True
+        self.serapi = subprocess.Popen(serapi_cmd,
+            stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE
             ,)
         self.debug = debug
 
@@ -48,9 +49,10 @@ class Coq:
         Args:
             cmd (str): command as a string.
         '''
+        if self.debug:
+            print(f'cmd = {cmd}')
         ## send command fully to serapi
         self._send_command(cmd)
-        #print('command sent successfully')
         ## get results of command
         result = self._get_result()
         return result
@@ -137,7 +139,6 @@ class Coq:
             result.append(current_result_sexpt)
             ## if complete tag found then we don't need to keep reading from serapi
             completed_getting_results = "Completed" in str(line)
-        print(len(result))
         return result
 
 ## utils
