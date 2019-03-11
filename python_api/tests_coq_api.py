@@ -1,5 +1,6 @@
 import unittest
-from sexpdata import loads, dumps
+#from sexpdata import loads, dumps
+import argparse
 
 import coq_api
 
@@ -10,8 +11,10 @@ from pdb import set_trace as st
 
 print(f'running TOP tests_coq_api SCRIPT')
 # TODO: sort of ugly?
-DEBUG = False
+DEBUG = True
 coq = coq_api.Coq(DEBUG)
+
+#CoqExn
 
 class TestStringMethods(unittest.TestCase):
     # example test: https://github.com/brando90/eit_proj1/blob/master/main_proj_lib/tests/test_user_implemented.py
@@ -162,13 +165,16 @@ class TestStringMethods(unittest.TestCase):
         ])
         # coq.exec(2)
         answers.append([
-        b'(Answer 4 Ack)\n',
-        b'(Feedback((doc_id 0)(span_id 3)(route 0)(contents(ProcessingIn master))))\n',
-        b'(Feedback((doc_id 0)(span_id 2)(route 0)(contents(ProcessingIn master))))\n',
-        b'(Feedback((doc_id 0)(span_id 1)(route 0)(contents Processed)))\n',
-        b'(Feedback((doc_id 0)(span_id 2)(route 0)(contents Processed)))\n',
-        b'(Feedback((doc_id 0)(span_id 3)(route 0)(contents Processed)))\n',
-        b'(Answer 4 Completed)\n'
+            b'(Answer 4 Ack)\n',
+            b'(Feedback((doc_id 0)(span_id 4)(route 0)(contents(ProcessingIn master))))\n',
+            b'(Feedback((doc_id 0)(span_id 3)(route 0)(contents(ProcessingIn master))))\n',
+            b'(Feedback((doc_id 0)(span_id 2)(route 0)(contents(ProcessingIn master))))\n',
+            b'(Feedback((doc_id 0)(span_id 1)(route 0)(contents Processed)))\n',
+            b'(Feedback((doc_id 0)(span_id 2)(route 0)(contents Processed)))\n',
+            b'(Feedback((doc_id 0)(span_id 3)(route 0)(contents Processed)))\n',
+            b'(Feedback((doc_id 0)(span_id 2)(route 0)(contents Processed)))\n',
+            b'(Feedback((doc_id 0)(span_id 4)(route 0)(contents Processed)))\n',
+            b'(Answer 4 Completed)\n',
         ])
         ## make full document in Python
         results = [] # results from each command sent to Coq
@@ -180,7 +186,7 @@ class TestStringMethods(unittest.TestCase):
         results.append(result)
         result = coq.add("Qed.")
         results.append(result)
-        result = coq.exec(3) # change this hardcode
+        result = coq.exec(4) # change this hardcode
         results.append(result)
         self.assertEqual(len(results),len(answers))
         ## check results pass tests

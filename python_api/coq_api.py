@@ -86,13 +86,13 @@ class Coq:
         '''
         return
 
-    def exec(self,tag):
+    def exec(self,exec_nb):
         ''' Executes the verification of Coq script up to the tag given.
 
         Args:
             tag (str/int): tag for Coq proof script
         '''
-        cmd = f'( Exec {tag} )'
+        cmd = f'( Exec {exec_nb} )'
         result = self.run_command(cmd) # get result from serapi when running command
         return result
 

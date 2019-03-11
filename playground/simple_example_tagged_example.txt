@@ -1,5 +1,3 @@
-
-
 sertop --no_init
 ----
 ( Tag1 (NewDoc ((top_name (TopPhysical "foo.v")))) )
