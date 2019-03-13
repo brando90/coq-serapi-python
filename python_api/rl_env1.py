@@ -33,7 +33,12 @@ class CoqEnv(gym.Env):
         this for learning.
         '''
         info = {} #useful for debugging
-        result = self.coq.add(action)
+        ## execute action
+        result = self.coq.add(action) # array of coq responses
+        ## type check every step
+        for current_result_line in result:
+            #self.coq.exe()
+
         return state, reward, done, info
 
     def reset(self):
