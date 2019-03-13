@@ -4,18 +4,20 @@ from gym.utils import seeding
 
 import coq_api
 
+from pdb import set_trace as st
+
 class CoqEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
-    def __init__(self,debug):
+    def __init__(self,doc_name,debug):
         '''
         instruction for gym:
         https://github.com/openai/gym/tree/master/gym/envs
         example:
         https://github.com/openai/gym-soccer/tree/master/gym_soccer
         '''
-        self.coq = Coq(debug=debug)
-        return
+        self.coq = coq_api.Coq(debug=debug)
+        result_new_doc = self.coq.new_doc(doc_name)
 
     def step(self, action):
         ''' Takes an action in the Coq env.
@@ -34,10 +36,13 @@ class CoqEnv(gym.Env):
         '''
         info = {} #useful for debugging
         ## execute action
+        print('doing action')
         result = self.coq.add(action) # array of coq responses
+        print('getting results')
         ## type check every step
         for current_result_line in result:
             #self.coq.exe()
+            print(current_result_line)
 
         return state, reward, done, info
 

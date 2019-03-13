@@ -95,6 +95,12 @@ class TestStringMethods(unittest.TestCase):
         #coq.run_command()
         self.assertEqual(True,True) # TODO
 
+    def test_catch_exception(self):
+        '''
+        TODO: make sure it does halt when a wrong proof is given
+        '''
+
+
 if __name__ == '__main__':
     print('running main in TESTS')
     unittest.main()
