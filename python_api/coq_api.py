@@ -134,7 +134,8 @@ class Coq:
             line = self.serapi.stdout.readline()
             if self.debug:
                 print(f'-> line={line}')
-            current_result_sexpt = pythonize_sexpt(sexpt=line)
+            #current_result_sexpt = pythonize_sexpt(sexpt=line)
+            current_result_sexpt = str(line)
             result.append(current_result_sexpt)
             ## if complete tag found then we don't need to keep reading from serapi
             completed_getting_results = "Completed" in str(line)
@@ -152,12 +153,13 @@ def add_tag(tag,cmd):
     tagged_command = f"( {tag} {cmd} )"
     return tagged_command
 
-def pythonize_sexpt(sexpt):
-    '''
-        TODO: convert sexpt to python object
-
-        https://github.com/ocaml-ppx/ppx_deriving_yojson
-    '''
-    pythonixed_sexpt = str(sexpt)
-    ##
-    return pythonixed_sexpt
+# def pythonize_sexpt(sexpt):
+#     '''
+#         TODO: convert sexpt to python object
+#
+#         https://github.com/ocaml-ppx/ppx_deriving_yojson
+#     '''
+#     #pythonixed_sexpt = str(sexpt)
+#     pythonixed_sexpt = loads(sexpt)
+#     ##
+#     return pythonixed_sexpt

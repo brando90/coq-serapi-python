@@ -3,6 +3,7 @@ from gym import error, spaces, utils
 from gym.utils import seeding
 
 import coq_api
+import utils
 
 from pdb import set_trace as st
 
@@ -40,10 +41,26 @@ class CoqEnv(gym.Env):
         result = self.coq.add(action) # array of coq responses
         print('getting results')
         ## type check every step
+        coq_exceptions = []
         for current_result_line in result:
-            #self.coq.exe()
+            #sexp_result_line = utils.pythonize_sexpt(current_result_line)
+            sexp_result_line = loads(current_result_line)
             print(current_result_line)
-
+            if 'CoqExn' in current_result_line: #TODO is this check better like this or parse it with sexp?
+                coq_exceptions.append(current_result_line)
+            self.coq.exec(2)
+        ## evalaute reward
+        reward = 0
+        if len(coq_exceptions) > 0: # if it didn't type check
+            reward = -1
+        elif 'Qed.' in action:
+            reward = 1
+        else:
+            reward = 0
+        ## get state = (current_goal, context)
+        state = 0
+        ## TODO: decide when environment is done...when it finishes proving all it wants (what does that mean, per proof?)
+        done = False
         return state, reward, done, info
 
     def reset(self):
