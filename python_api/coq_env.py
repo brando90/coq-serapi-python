@@ -41,26 +41,22 @@ class CoqEnv(gym.Env):
         action_result = self.coq.add(action) # array of coq responses
         ## type check every step #TODO is this check better like this or parse it with sexp?
         coq_exceptions = []
-        for current_result_line in action_result:
+        for action_line in action_result:
             ## extract Added number and execute that added statement
-            current_result_line = str(current_result_line,"utf-8")
-            if 'Added' in current_result_line:
-                # extrac exec
-                sexp_result_line = loads(current_result_line)
+            action_line = str(action_line,"utf-8")
+            if 'Added' in action_line:
+                # extract exec
+                sexp_result_line = loads(action_line)
                 added_array = sexp_result_line[2]
                 exec_nb = added_array[1]
                 # execute added line
                 exec_result = self.coq.exec(exec_nb)
                 ## check if current exec as an CoqExc
                 for exec_line in exec_result:
-                    print(current_result_line)
-                    print(exec_line)
-                    print(str(exec_line))
-                    st()
-                    print(str(current_result_line,"utf-8"))
-                    if 'CoqExn' in str(current_result_line,"utf-8"):
-                        coq_exceptions.append(current_result_line)
-        print(len(coq_exceptions))
+                    if 'CoqExn' in str(exec_line,"utf-8"):
+                        coq_exceptions.append(action_line)
+                        ## add action that caused exception happened
+                        info['CoqExn'] = action_result
         ## evalaute reward
         reward = 0
         if len(coq_exceptions) > 0: # if it didn't type check
