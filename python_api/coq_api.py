@@ -137,7 +137,7 @@ class Coq:
             current_result_sexpt = pythonize_sexpt(sexpt=line)
             result.append(current_result_sexpt)
             ## if complete tag found then we don't need to keep reading from serapi
-            completed_getting_results = "Completed" in str(line) or 'CoqExn' in str(line)
+            completed_getting_results = "Completed" in str(line)
         return result
 
 ## utils
