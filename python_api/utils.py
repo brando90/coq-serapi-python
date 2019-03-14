@@ -8,7 +8,7 @@ def pythonize_sexpt(sexpt):
 
         https://github.com/ocaml-ppx/ppx_deriving_yojson
     '''
-    #pythonixed_sexpt = str(sexpt)
-    pythonixed_sexpt = loads(sexpt)
+    #sexpt = str(sexpt)
+    #sexpt = loads(sexpt)
     ##
-    return pythonixed_sexpt
+    return sexpt

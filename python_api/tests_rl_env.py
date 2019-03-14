@@ -19,23 +19,23 @@ env = coq_env.CoqEnv(doc_name,DEBUG)
 class TestStringMethods(unittest.TestCase):
     # example test: https://github.com/brando90/eit_proj1/blob/master/main_proj_lib/tests/test_user_implemented.py
 
-    def test_positive_reward(self):
-        '''
-
-        (Add () "Example test_oddb1: Nat.odd 1 = true. reflexivity. Qed.")
-        '''
-        action = 'Example test_oddb1: Nat.odd 1 = true. reflexivity. Qed.'
-        state, reward, done, info = env.step(action)
-        self.assertEqual(reward,1)
-
-    # def test_negative_reward(self):
+    # def test_positive_reward(self):
     #     '''
     #
-    #     (Add () "Example test_oddb1: Nat.odd 1 = true. Qed.")
+    #     (Add () "Example test_oddb1: Nat.odd 1 = true. reflexivity. Qed.")
     #     '''
-    #     action = 'Example test_oddb1: Nat.odd 1 = true. Qed.'
+    #     action = 'Example test_oddb1: Nat.odd 1 = true. reflexivity. Qed.'
     #     state, reward, done, info = env.step(action)
-    #     self.assertEqual(reward,-1)
+    #     self.assertEqual(reward,1)
+
+    def test_negative_reward(self):
+        '''
+
+        (Add () "Example test_oddb1: Nat.odd 1 = true. Qed.")
+        '''
+        action = 'Example test_oddb1: Nat.odd 1 = true. Qed.'
+        state, reward, done, info = env.step(action)
+        self.assertEqual(reward,-1)
 
 if __name__ == '__main__':
     print('running main in RL ENV TESTS')
