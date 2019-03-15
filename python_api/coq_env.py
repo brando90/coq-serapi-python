@@ -8,6 +8,39 @@ import utils
 
 from pdb import set_trace as st
 
+class ActionSpace:
+
+    def __init__(self):
+        '''
+        Stage 1: Proving Easy Goals
+        reflexivity
+        assumption
+        discriminate
+        constructor
+
+        Stage 2: Transforming Your Goal
+        apply
+        subst
+        rewrite
+        simpl
+        cut
+        unfold
+
+        Stage 3: Breaking Apart Your Goal
+        destruct
+        inversion
+        induction
+
+        Stage 4: Powerful Automatic Tactics
+        auto
+        intuition
+        omega
+
+        https://pjreddie.com/coq-tactics/
+        '''
+        actions = ['reflexivity','assumption','discriminate','constructor','symmetry']
+        n = len(actions)
+
 class CoqEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
@@ -20,6 +53,9 @@ class CoqEnv(gym.Env):
         '''
         self.coq = coq_api.Coq(debug=debug)
         result_new_doc = self.coq.new_doc(doc_name)
+        ##
+        self.action_space = ActionSpace()
+
 
     def step(self, action):
         ''' Takes an action in the Coq env.
