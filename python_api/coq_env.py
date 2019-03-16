@@ -102,6 +102,7 @@ class CoqEnv(gym.Env):
         else:
             reward = 0
         ## get state = (current_goal, context)
+        goal = 
         state = 0
         ## TODO: decide when environment is done...when it finishes proving all it wants (what does that mean, per proof?)
         done = False
