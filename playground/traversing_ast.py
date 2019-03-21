@@ -1,27 +1,17 @@
 from sexpdata import loads, dumps
 from sexpdata import Symbol
 
+from pdb import set_trace as st
+
 ## https://github.com/coq/coq/blob/96c9b16f03ef6898b575a0cc78470f0fa86fd2e4/kernel/constr.mli#L207
 
-class Constr:
-    # just a Coq term
-
-    def __init__(self,sexp):
+# From constr.mli
+class Constr(object):
+    def __init__(self, sexp):
         self.sexp = sexp
-        if sexp[0] == Symbol('App'):
-            print(len((sexp[1],sexp[2])))
-            #print(App.__init__(sexp[1],sexp[2]))
-            #print( App(sexp[1],sexp[2]) )
-            #self = App.__init__(sexp[1],sexp[2])
-
-    def print(self):
-        print(f'self.sexp = {self.sexp}')
 
     def __repr__(self):
-        return f'self.sexp = {self.sexp}'
-
-    def constants(self):
-        return []
+        return self.sexp.__repr__()
 
 def App(Constr):
 
@@ -97,18 +87,26 @@ class Goal:
 class Goals:
 
     def __init__(self,sexp):
-        print(sexp[0][1])
-        self.fg_goals = [ Goal(goal) for goal in sexp[0][1] ]
-        print(f'self.fg_goals[0] = {self.fg_goals[0].name}')
-        #TODO other goals later
+        ''' Create Goals object with all information about goals.
 
-    def print(self):
-        print('INSIDE GOALS')
-        #print(self.fg_goals)
-        for fg_goal in self.fg_goals:
-            print(f'current fg_goal = {fg_goal}')
-            fg_goal.print()
-        print('DONE GOALS')
+        Assumes it receives all_goals = [ fg_goals ..., bg_goals ..., shelved_goals ..., given_up_goals ...]
+        '''
+        ## process fg_goals
+        fg_goals = sexp[0] # [ fg_goals ...]
+        self.fg_goals = []
+        fg_goals = fg_goals[1] # list of fg_goals
+        for goal in fg_goals:
+            self.fg_goals.append( Goal(goal) )
+        #TODO bg_goals ..., shelved_goals ..., given_up_goals
+        bg_goals = sexp[1]
+        shelved_goals = sexp[2]
+        given_up_goals = sexp[3]
+
+    def __repr__(self):
+        str_repr = ''
+        for goal in self.fg_goals:
+            str_repr = str_repr + '\n' + str(goal)
+        return str_repr
 
 ####
 
@@ -158,14 +156,13 @@ def pythonize_something():
                      (Instance ())))))))))
              (bg_goals ()) (shelved_goals ()) (given_up_goals ()))))))
     '''
-    print(sexp)
-    #print(sexp)
     psexp = loads(sexp)
-    fg_goals = psexp[2][1][0][1]
-    fg_goals = Goals(fg_goals)
-    # we can probably get to ty using BFS, how to traverse hyp?
-    # this reaches `ty`, the current goal
-    fg_goals.print()
+    all_goals = psexp[2][1][0][1] # [ fg_goals ..., bg_goals ..., shelved_goals ..., given_up_goals ...]
+    print(f'all_goals[0]={all_goals[0]}\all_goals[1]={all_goals[1]}\all_goals[2]={all_goals[2]}\all_goals[3]={all_goals[3]}\n')
+    print('----')
+    all_goals = Goals(all_goals)
+    print(f'all_goals = {all_goals}')
 
 if __name__ == '__main__':
+    print('Running MAIN')
     pythonize_something()
