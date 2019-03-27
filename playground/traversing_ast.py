@@ -143,6 +143,16 @@ class Id:
     def __repr__(self):
         return str(self.symbol)
 
+#TODO
+class Ind(Constr):
+    def __init__(self, sexp):
+        super().__init__(sexp)
+        self.head = build_obj(sexp[1])
+        self.args = list(map(build_obj, sexp[2]))
+
+    def __repr__(self):
+        return "App " + self.head.__repr__() + "@" + self.args.__repr__()
+
 class Goal:
     def __init__(self,sexp):
         ## store name
@@ -150,7 +160,8 @@ class Goal:
         ## store type
         ty_array = sexp[1] # [Symbol('ty'), [...type...] ]
         ty = ty_array[1] # [...type...] e.g. [Symbol('App'), ... ]
-        self.ty = Constr(ty)
+        #self.ty = Constr(ty)
+        self.ty = build_obj(ty)
         ## store hypothsis/local proof
         hyp_array = sexp[2] # [Symbol('hyp') , [...hyp...] ]
         hyps = hyp_array[1] # [...hyp...] e.g. [[[Symbol('Id'), Symbol('n') ]], ...]
@@ -188,6 +199,29 @@ class Goals:
         for goal in self.fg_goals:
             str_repr = str_repr + '\n' + str(goal)
         return str_repr
+
+def build_obj(sexp):
+    if isinstance(sexp, str):
+        return Constr(sexp)
+    term_key = sexp[0]
+    term_key = term_key._val if type(term_key) == Symbol else term_key
+    ## create appropriate Constr/Coq term
+    if term_key in globals():
+        constructor = globals()[term_key]
+        return constructor(sexp)
+    else:
+        return Constr(sexp)
+
+# def build_obj_old(sexp):
+#     if isinstance(sexp, str):
+#         return Constr(sexp)
+#     term_key = sexp[0]
+#     ## create appropriate Constr/Coq term
+#     if term_key in globals():
+#         cons = globals()[term_key]
+#         return (globals()[term_key](sexp))
+#     else:
+#         return Constr(sexp)
 
 ####
 
