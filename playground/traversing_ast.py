@@ -3,7 +3,89 @@ from sexpdata import Symbol
 
 from pdb import set_trace as st
 
+#from pythonize_goals import *
+
 ## https://github.com/coq/coq/blob/96c9b16f03ef6898b575a0cc78470f0fa86fd2e4/kernel/constr.mli#L207
+
+# From names.mli
+class Id(object):
+    def __init__(self, sexp):
+        self.value = sexp
+
+    def __repr__(self):
+        return self.value.__repr__()
+
+# XXX: fixme
+class Constant(object):
+    def __init__(self, sexp):
+        self.value = sexp
+
+    def __repr__(self):
+        return self.value.__repr__()
+
+# From constr.mli
+class Constr(object):
+    def __init__(self, sexp):
+        self.sexp = sexp
+
+    def __repr__(self):
+        return self.sexp.__repr__()
+
+class Rel(Constr):
+    def __init__(self, sexp):
+        super().__init__(sexp)
+        self.idx = int(sexp[1])
+
+    def __repr__(self):
+        return "Rel " + self.idx.__repr__()
+
+class Var(Constr):
+    def __init__(self, sexp):
+        super().__init__(sexp)
+        self.var = Id(sexp[1])
+
+    def __repr__(self):
+        return "Var " + self.var.__repr__()
+
+class Prod(Constr):
+    def __init__(self, sexp):
+        super().__init__(sexp)
+        # Todo
+        # self.binder = list(map(...,sexp[0]))
+        self.binder_type = build_obj(sexp[1])
+        self.body = build_obj(sexp[2])
+
+    def __repr__(self):
+        return "Prod "
+
+class Lambda(Constr):
+    def __init__(self, sexp):
+        super().__init__(sexp)
+        # Todo
+        # self.binder = list(map(...,sexp[0]))
+        self.binder_type = build_obj(sexp[1])
+        self.body = build_obj(sexp[2])
+
+    def __repr__(self):
+        return "Lambda "
+
+class App(Constr):
+    def __init__(self, sexp):
+        super().__init__(sexp)
+        self.head = build_obj(sexp[1])
+        self.args = list(map(build_obj, sexp[2]))
+
+    def __repr__(self):
+        return "App " + self.head.__repr__() + "@" + self.args.__repr__()
+
+class Const(Constr):
+    def __init__(self, sexp):
+        super().__init__(sexp)
+        self.constant = Constant(sexp[1])
+        self.univs = []
+
+    def __repr__(self):
+        return "Const "
 
 # From constr.mli
 class Constr(object):
@@ -14,7 +96,6 @@ class Constr(object):
         return self.sexp.__repr__()
 
 def App(Constr):
-
     def __init__(self,head,args):
         self.head = Constr(head)
         self.args = [ Constr(arg) for arg in args]
@@ -33,7 +114,6 @@ def App(Constr):
         return constants
 
 class Hyp:
-
     def __init__(self,sexp):
         ##
         '''
@@ -48,13 +128,15 @@ class Hyp:
             self.body = Constr(sexp[1][0])
         self.type = Constr(sexp[2])
 
-    def print(self):
-        print('Hyp')
-        print(f'self.names = {self.names}')
-        self.type.print()
+    def __repr__(self):
+        str_repr = ''
+        for name_id in self.names:
+            str_repr = str_repr + f'NAME_ID: {str(name_id)} \n'
+        str_repr = str_repr + f'BODY: {str(self.body)} \n'
+        str_repr = str_repr + f'TYPE: {str(self.type)} \n'
+        return str_repr
 
 class Id:
-
     def __init__(self,symbol):
         self.symbol = symbol # its string
 
@@ -62,30 +144,29 @@ class Id:
         return str(self.symbol)
 
 class Goal:
-
     def __init__(self,sexp):
-        #print(f'sexp = {sexp}')
-        #sexp = sexp[0]
-        #print(f'sexp[0][1] = {sexp[0]}')
+        ## store name
         self.name = sexp[0][1]
-        self.ty = Constr(sexp[1][1])
-        #print(f'sexp[2] = {sexp[2]}')
-        self.hyp = [ Hyp(hyp) for hyp in sexp[2][1] ]
+        ## store type
+        ty_array = sexp[1] # [Symbol('ty'), [...type...] ]
+        ty = ty_array[1] # [...type...] e.g. [Symbol('App'), ... ]
+        self.ty = Constr(ty)
+        ## store hypothsis/local proof
+        hyp_array = sexp[2] # [Symbol('hyp') , [...hyp...] ]
+        hyps = hyp_array[1] # [...hyp...] e.g. [[[Symbol('Id'), Symbol('n') ]], ...]
+        self.hyp = []
+        for hyp in hyps:
+            hyp = Hyp(hyp)
+            self.hyp.append( hyp )
 
-    def print(self):
-        print('INSIDE PRINT GOAL')
-        print(f'self.name = {self.name}')
-        #print(f'self.ty = {self.ty}')
-        print('self.ty')
-        self.ty.print()
-        print('self.hyp')
-        #print(f'self.hyp = {self.hyp}')
+    def __repr__(self):
+        str_repr = f'NAME: {str(self.name)} \n'
+        str_repr = str_repr + f'TY: {str(self.ty)} \n'
         for hyp in self.hyp:
-            hyp.print()
-        print('DONE PRINT GOAL')
+            str_repr = str_repr + f'HYP: {str(hyp)} \n'
+        return str_repr
 
 class Goals:
-
     def __init__(self,sexp):
         ''' Create Goals object with all information about goals.
 
@@ -110,11 +191,34 @@ class Goals:
 
 ####
 
+#def is_atom(node):
+
+def traverse_tree(psexp,jast):
+    for node in psexp:
+        if type(node) == Symbol:
+            term_key = node._val
+            if term_key in globals():
+                #jast[term_key] = jast[term_key]
+                print(term_key)
+        elif type(node) == int:
+            print(node)
+            if node in globals():
+                print(node)
+        else:
+            traverse_tree(node,jast)
+
 def pythonize_something():
     '''
 
     '''
     ##
+    '''
+    1 subgoal (ID 10)
+
+      n : nat
+      ============================
+      0 + n = n
+    '''
     sexp = '''
         (Answer 2
          (ObjList
@@ -157,11 +261,17 @@ def pythonize_something():
              (bg_goals ()) (shelved_goals ()) (given_up_goals ()))))))
     '''
     psexp = loads(sexp)
+    print(psexp)
+    print()
     all_goals = psexp[2][1][0][1] # [ fg_goals ..., bg_goals ..., shelved_goals ..., given_up_goals ...]
-    print(f'all_goals[0]={all_goals[0]}\all_goals[1]={all_goals[1]}\all_goals[2]={all_goals[2]}\all_goals[3]={all_goals[3]}\n')
+    print(f'all_goals[0]={all_goals[0]}\nall_goals[1]={all_goals[1]}\nall_goals[2]={all_goals[2]}\nall_goals[3]={all_goals[3]}\n')
     print('----')
     all_goals = Goals(all_goals)
     print(f'all_goals = {all_goals}')
+    print('\n\n\n----')
+    #print(globals())
+    #jast = {}
+    #traverse_tree(all_goals[0],jast)
 
 if __name__ == '__main__':
     print('Running MAIN')
