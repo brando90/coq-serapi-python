@@ -33,11 +33,20 @@ class Constant(object):
 
 class Inductive(object):
     def __init__(self, sexp):
-        self.mutind = KerPair(sexp[0])
+        self.mutind = KerPair(sexp)
         self.idx = sexp[1] #int
 
     def __repr__(self):
         return "Inductive " + self.idx.__repr__()
+
+    def embedding(self):
+        print(f'\n self.mutind = {self.mutind}')
+        if self.mutind.name not in AI_REP:
+            embedding = torch.rand(D,1)
+            AI_REP[self.mutind] = embedding
+        else:
+            embedding = AI_REP[self.mutind]
+        return embedding
 
 def KerPair(object):
     def __init__(self, sexp):
@@ -68,12 +77,17 @@ class Constr(object):
 class Ind(Constr):
     def __init__(self, sexp):
         super().__init__(sexp)
-        #print(f'---> sexp = {sexp}')
-        self.inductive = Inductive(sexp[1][0])
-        self.universes = sexp[1][1]
+        print(f'------> Ind sexp = {sexp}')
+        self.inductive = Inductive(sexp[1][0][0][0])
+        self.universes = sexp[1][0][1]
 
     def __repr__(self):
         return "Ind " + self.inductive.__repr__()
+
+    def embedding(self):
+        print(f'\nself.sexp = {self.sexp}')
+        embedding = self.inductive.embedding()
+        return embedding
 
 class Rel(Constr):
     def __init__(self, sexp):
