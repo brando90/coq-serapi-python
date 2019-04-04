@@ -143,15 +143,21 @@ class Id:
     def __repr__(self):
         return str(self.symbol)
 
-#TODO
-class Ind(Constr):
-    def __init__(self, sexp):
-        super().__init__(sexp)
-        self.head = build_obj(sexp[1])
-        self.args = list(map(build_obj, sexp[2]))
+ai_rep = {'eq': np.array(5,5), 'plus': np.array(5,5), 'id nat n': np.array(5,5)}
 
-    def __repr__(self):
-        return "App " + self.head.__repr__() + "@" + self.args.__repr__()
+def coq_term_to_embedding(coq_term_python):
+    for terms:
+        embedding = ai_rep[terms]
+
+#TODO
+# class Ind(Constr):
+#     def __init__(self, sexp):
+#         super().__init__(sexp)
+#         self.head = build_obj(sexp[1])
+#         self.args = list(map(build_obj, sexp[2]))
+#
+#     def __repr__(self):
+#         return "App " + self.head.__repr__() + "@" + self.args.__repr__()
 
 class Goal:
     def __init__(self,sexp):
@@ -161,6 +167,8 @@ class Goal:
         ty_array = sexp[1] # [Symbol('ty'), [...type...] ]
         ty = ty_array[1] # [...type...] e.g. [Symbol('App'), ... ]
         #self.ty = Constr(ty)
+        # print(f'\nty={ty}')
+        # st()
         self.ty = build_obj(ty)
         ## store hypothsis/local proof
         hyp_array = sexp[2] # [Symbol('hyp') , [...hyp...] ]
@@ -205,10 +213,16 @@ def build_obj(sexp):
         return Constr(sexp)
     term_key = sexp[0]
     term_key = term_key._val if type(term_key) == Symbol else term_key
+    # print(f'term_key={term_key}')
+    # st()
     ## create appropriate Constr/Coq term
     if term_key in globals():
         constructor = globals()[term_key]
-        return constructor(sexp)
+        coq_term = constructor(sexp)
+        print(f'\ncoq_term = {coq_term}')
+        print(f'\nApp = {App(sexp)}')
+        st()
+        return coq_term
     else:
         return Constr(sexp)
 
