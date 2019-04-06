@@ -55,7 +55,7 @@ def KerPair(object):
         #self.universes = sexp[2]
 
     def __repr__(self):
-        return "Inductive " + self.idx.__repr__()
+        return "KerPair " + self.idx.__repr__()
 
 # From constr.mli
 class Constr(object):
@@ -78,7 +78,8 @@ class Ind(Constr):
     def __init__(self, sexp):
         super().__init__(sexp)
         print(f'------> Ind sexp = {sexp}')
-        self.inductive = Inductive(sexp[1][0][0][0])
+        mutind = sexp[1][0][0]
+        self.inductive = Inductive(mutind[1])
         self.universes = sexp[1][0][1]
 
     def __repr__(self):
@@ -187,6 +188,7 @@ class Goal:
         ## store type
         ty_array = sexp[1] # [Symbol('ty'), [...type...] ]
         ty = ty_array[1] # [...type...] e.g. [Symbol('App'), ... ]
+        print(f'===> ty = {ty}\n')
         self.ty = build_obj(ty)
         ## store hypothsis/local proof
         hyp_array = sexp[2] # [Symbol('hyp') , [...hyp...] ]
