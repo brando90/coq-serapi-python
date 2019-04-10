@@ -33,6 +33,7 @@ class Constant(object):
 
 class Inductive(object):
     def __init__(self, sexp):
+        print(f'=====> Inductive sexp = {sexp}')
         self.mutind = KerPair(sexp)
         self.idx = sexp[1] #int
 
@@ -48,10 +49,10 @@ class Inductive(object):
             embedding = AI_REP[self.mutind]
         return embedding
 
-def KerPair(object):
+class KerPair(object):
     def __init__(self, sexp):
-        super().__init__(sexp)
-        self.name = sexp[1]
+        #super().__init__(sexp)
+        self.name = sexp[0]
         #self.universes = sexp[2]
 
     def __repr__(self):
@@ -135,8 +136,10 @@ class Lambda(Constr):
 class App(Constr):
     def __init__(self, sexp):
         super().__init__(sexp)
+        print(f'+++> sexp[1] = {sexp[1]}')
         self.head = build_obj(sexp[1])
-        self.args = list(map(build_obj, sexp[2]))
+        #self.args = list(map(build_obj, sexp[2]))
+        self.args = [ build_obj(arg) for arg in sexp[2] ]
 
     def __repr__(self):
         return "App " + self.head.__repr__() + "@" + self.args.__repr__()
@@ -228,18 +231,19 @@ class Goals:
             str_repr = str_repr + '\n' + str(goal)
         return str_repr
 
-def build_obj_old(sexp):
-    if isinstance(sexp, str):
-        return Constr(sexp)
-    term_key = sexp[0]
-    if term_key in globals():
-        return (globals()[term_key](sexp))
-    else:
-        return Constr(sexp)
+# def build_obj_old(sexp):
+#     if isinstance(sexp, str):
+#         return Constr(sexp)
+#     term_key = sexp[0]
+#     if term_key in globals():
+#         return (globals()[term_key](sexp))
+#     else:
+#         return Constr(sexp)
 
 def build_obj(sexp):
     if isinstance(sexp, str):
         return Constr(sexp)
+    ## unwrap the key from the sexp library
     term_key = sexp[0]
     term_key = term_key._val if type(term_key) == Symbol else term_key
     ## create appropriate Constr/Coq term
@@ -305,15 +309,22 @@ def pythonize_something():
              (bg_goals ()) (shelved_goals ()) (given_up_goals ()))))))
     '''
     psexp = loads(sexp)
-    print(psexp)
+    print('parsed s-expression')
+    print(f'psexp = {psexp}')
     print()
     all_goals = psexp[2][1][0][1] # [ fg_goals ..., bg_goals ..., shelved_goals ..., given_up_goals ...]
-    print(f'all_goals[0]={all_goals[0]}\nall_goals[1]={all_goals[1]}\nall_goals[2]={all_goals[2]}\nall_goals[3]={all_goals[3]}\n')
-    print('----')
+    print('print all goals')
+    print(f'all_goals[0]={all_goals[0]}\nall_goals[1]={all_goals[1]}\nall_goals[2]={all_goals[2]}\nall_goals[3]={all_goals[3]}')
+    print()
+    print('---> Start decorating the object')
     all_goals = Goals(all_goals)
     print(f'all_goals = {all_goals}')
-    print('\n\n\n----')
+    print()
+    print('printed parsed ty object inside goal')
     print(f'all_goals.fg_goals.ty = {all_goals.fg_goals[0].ty}')
+    print()
+    print('---')
+    print('print the embeddings for the Coq Term AST')
     embedding = all_goals.fg_goals[0].ty.embedding()
     print(f'embedding = {embedding}')
 
