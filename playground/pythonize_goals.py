@@ -8,27 +8,36 @@ import torch
 D = 3
 AI_REP = {}
 
+def add_2_AI_REP(key):
+    if key not in AI_REP:
+        embedding = torch.rand(D,1)
+        AI_REP[key] = embedding
+    else:
+        embedding = AI_REP[key]
+    return embedding
+
 # From names.mli
 class Id(object):
     def __init__(self, sexp):
-        self.value = sexp
+        self.value = sexp[1]._val
 
     def __repr__(self):
         return self.value.__repr__()
 
     def embedding(self):
-        embedding = AI_REP[self.sexp]
+        embedding = add_2_AI_REP(self.value)
         return embedding
 
 class Constant(object):
     def __init__(self, sexp):
-        self.value = sexp # TODO: fixme
+        print(f'+++> Constant = {str(sexp)}')
+        self.value = str(sexp) # TODO: fixme
 
     def __repr__(self):
         return self.value.__repr__()
 
     def embedding(self):
-        embedding = AI_REP[self.value]
+        embedding = add_2_AI_REP(self.value)
         return embedding
 
 class Inductive(object):
@@ -42,24 +51,20 @@ class Inductive(object):
 
     def embedding(self):
         print(f'\n self.mutind = {self.mutind}')
-        if self.mutind.name not in AI_REP:
-            embedding = torch.rand(D,1)
-            AI_REP[self.mutind] = embedding
-        else:
-            embedding = AI_REP[self.mutind]
+        embedding = add_2_AI_REP(self.mutind.name)
         return embedding
 
 class KerPair(object):
     def __init__(self, sexp):
         #super().__init__(sexp)
-        self.name = sexp[0]
+        self.name = sexp[0]._val
         #self.universes = sexp[2]
 
     def __repr__(self):
-        return "KerPair " + self.idx.__repr__()
+        return f"KerPair {self.name}"
 
 # From constr.mli
-class Constr(object):
+class Constr(object): #Coq term
     def __init__(self, sexp):
         self.sexp = sexp
 
@@ -67,13 +72,10 @@ class Constr(object):
         return self.sexp.__repr__()
 
     def embedding(self):
-        print(f'\nself.sexp = {self.sexp}')
-        if self.sexp not in AI_REP:
-            embedding = torch.rand(D,1)
-            AI_REP[self.sexp] = embedding
-        else:
-            embedding = AI_REP[self.sexp]
-        return embedding
+        '''
+        Since Constr is an abstract class so it doesn't have an embedding
+        '''
+        print(f'--> Unhandled op in Constr with self.sexp = {self.sexp}')
 
 class Ind(Constr):
     def __init__(self, sexp):
@@ -89,6 +91,23 @@ class Ind(Constr):
     def embedding(self):
         print(f'\nself.sexp = {self.sexp}')
         embedding = self.inductive.embedding()
+        return embedding
+
+class Construct(Constr):
+    def __init__(self, sexp):
+        super().__init__(sexp)
+        print(f'------> Ind sexp = {sexp}')
+        self.inductive = Inductive(sexp[1][0][0][0])
+        self.index = sexp[1][0][0][1] #TODO, part of the definition of the type/construct, concatate to the inductive embedding alter
+        self.universes = sexp[1][0][1] #TODO
+
+    def __repr__(self):
+        return "Ind " + self.inductive.__repr__()
+
+    def embedding(self):
+        print(f'\nself.sexp = {self.sexp}')
+        cons = self.inductive.mutind.name + str(self.index)
+        embedding = add_2_AI_REP(cons)
         return embedding
 
 class Rel(Constr):
@@ -152,14 +171,18 @@ class App(Constr):
             args_embeddings.append( arg_embedding )
         return args_embeddings
 
-class Const(Constr):
+class Const(Constr): # is a directory path e.g.
     def __init__(self, sexp):
         super().__init__(sexp)
-        self.constant = Constant(sexp[1])
+        self.constant = Constant(sexp[1][0])
         self.univs = []
 
     def __repr__(self):
-        return "Const "
+        return f"Const {self.constant}"
+
+    def embedding(self):
+        embedding = self.constant.embedding()
+        return embedding
 
 class Hyp:
     def __init__(self,sexp):
