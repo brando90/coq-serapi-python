@@ -254,15 +254,6 @@ class Goals:
             str_repr = str_repr + '\n' + str(goal)
         return str_repr
 
-# def build_obj_old(sexp):
-#     if isinstance(sexp, str):
-#         return Constr(sexp)
-#     term_key = sexp[0]
-#     if term_key in globals():
-#         return (globals()[term_key](sexp))
-#     else:
-#         return Constr(sexp)
-
 def build_obj(sexp):
     if isinstance(sexp, str):
         return Constr(sexp)
