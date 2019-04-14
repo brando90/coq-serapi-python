@@ -88,6 +88,18 @@ class TestStringMethods(unittest.TestCase):
                 print(answer[i])
             self.assertEqual(str(current_result_sexpt), str(answer[i]))
 
+    def test_exec(self):
+        '''
+        TODO
+        '''
+        self.assertEqual(True,True)
+
+    def test_query(self):
+        '''
+        TODO
+        '''
+        self.assertEqual(True,True)
+
     def test_run_command(self):
         '''
         TODO
@@ -99,7 +111,7 @@ class TestStringMethods(unittest.TestCase):
         '''
         TODO: make sure it does halt when a wrong proof is given
         '''
-
+        return
 
 if __name__ == '__main__':
     print('running main in TESTS')

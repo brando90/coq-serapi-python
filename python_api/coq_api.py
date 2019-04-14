@@ -96,13 +96,15 @@ class Coq:
         result = self.run_command(cmd) # get result from serapi when running command
         return result
 
-    def query(self):
+    def query(self,query_cmd,args=''):
         '''
-        TODO
+        TODO make method proper
+        https://github.com/brando90/coq-serapi-python/blob/python-api/serapi/serapi_protocol.ml#L365
         '''
-
-
-        return
+        # TODO, put the right arguments to the query according to the protocol https://github.com/brando90/coq-serapi-python/blob/python-api/serapi/serapi_protocol.ml#L365
+        cmd = f'( Query ({args}) {query_cmd} )'
+        result = self.run_command(cmd) # get result from serapi when running command
+        return result
 
     def print(self):
         '''
@@ -155,16 +157,6 @@ def add_tag(tag,cmd):
     '''
     tagged_command = f"( {tag} {cmd} )"
     return tagged_command
-
-def ToPolish():
-    '''
-    https://stackoverflow.com/questions/55253801/converting-coq-term-in-ast-form-to-polish-notation-using-python
-    '''
-    if node is an atom:
-        text := text+node.text
-    else:
-        text := text + ToPolish(node,text)
-    return text
 
 # def pythonize_sexpt(sexpt):
 #     '''

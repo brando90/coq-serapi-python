@@ -102,8 +102,12 @@ class CoqEnv(gym.Env):
         else:
             reward = 0
         ## get state = (current_goal, context)
-        goal = 
-        state = 0
+        query_result = self.coq.query('Goals')
+        state = str(query_result[1])
+        #print(f'type(state) = {type(state)}')
+        #print(f'query_result[0] = {query_result[0]}') # start of msg
+        #print(f'query_result[1] = {query_result[1]}') # real content
+        #print(f'query_result[2] = {query_result[2]}') # completed part
         ## TODO: decide when environment is done...when it finishes proving all it wants (what does that mean, per proof?)
         done = False
         return state, reward, done, info
@@ -114,6 +118,12 @@ class CoqEnv(gym.Env):
     def render(self, mode='human', close=False):
         '''
         pretty print like in proof general/CoqIde
+        '''
+        return
+
+    def seed(self):
+        '''
+        TODO
         '''
         return
 
