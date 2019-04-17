@@ -38,8 +38,11 @@ class ActionSpace:
 
         https://pjreddie.com/coq-tactics/
         '''
-        actions = ['reflexivity','assumption','discriminate','constructor','symmetry']
-        n = len(actions)
+        self.actions = ['reflexivity','assumption','discriminate','constructor','symmetry']
+        self.n = len(self.actions)
+
+    def __repr__(self):
+        return str(self.actions)
 
 class CoqEnv(gym.Env):
     metadata = {'render.modes': ['human']}

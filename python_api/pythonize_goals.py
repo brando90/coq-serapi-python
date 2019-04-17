@@ -5,9 +5,6 @@ from pdb import set_trace as st
 
 import torch
 
-D = 3
-AI_REP = {}
-
 def add_2_AI_REP(key):
     if key not in AI_REP:
         embedding = torch.rand(D,1)

@@ -9,11 +9,13 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torch.distributions import Categorical
 
-from ai_mathematician import D_embedding
+import coq_env
+from ai_mathematician import AI_REP
+from ai_mathematician import Policy_ConvFcSoftmax
 
-import plotting as my_plt
+#import plotting as my_plt
 
-import pdb
+from pdb import set_trace as st
 
 #EPS = np.finfo(np.float32).eps.item()
 
@@ -35,6 +37,9 @@ parser.add_argument('--ema_alpha', type=float, default=0.10, metavar='G',
 parser.add_argument('--no-plot', dest='plot', action='store_false')
 parser.add_argument('--render', dest='render', action='store_true',help='render the environment')
 #parser.add_argument('--no-render', dest='render', action='store_false',help='render the environment')
+parser.add_argument('--DEBUG', dest='DEBUG', action='store_true',help='set debugging flag')
+parser.add_argument('--D_embedding', type=int, default=10,
+                    help='Dimension of the embeddings for the symbols')
 args = parser.parse_args()
 
 def finish_episode(policy,optimizer, gamma):
@@ -86,6 +91,7 @@ def train(policy,optimizer,env,gamma,nb_episodes=1000,time_steps=1000,ema_alpha=
         state, ep_return = env.reset(), 0
         for t in range(time_steps):  # Don't infinite loop while learning
             action = policy.select_action(state)
+            st()
             state, reward, done, _ = env.step(action)
             st()
             if args.render:
@@ -106,6 +112,7 @@ def train(policy,optimizer,env,gamma,nb_episodes=1000,time_steps=1000,ema_alpha=
     print(f'Running return = {running_return}\tenv.spec.reward_threshold={env.spec.reward_threshold}')
 
 if __name__ == '__main__':
+    DEBUG = args.DEBUG
     ''' create Env '''
     doc_name = 'foo.v'
     env = coq_env.CoqEnv(doc_name,DEBUG)
@@ -118,18 +125,25 @@ if __name__ == '__main__':
     learning_rate = args.learning_rate
     ema_alpha = args.ema_alpha
     ''' Policy/AI-Mathematician '''
-    ## CHW
-    CHW = (1,D_embedding,1) # C=1 cuz there is not colors channels in embedding, W=1 cuz each symbol has its own embedding
+    action_space = env.action_space
+    print(f'Action space/tactics: {env.action_space}')
+    D_embedding = args.D_embedding
+    ## CHW = (C=1,H=D_embedding,W=nb_symbols_in_input)
+    #NOTE: filter sizes are limited by the number of symbols in the inpiut check evernote FILTER SIZE CONVAITP
+    nb_symbols_in_input = 1
+    CHW = (1,D_embedding,nb_symbols_in_input) # C=1 cuz there is not colors channels in embedding, H=D_embedding, W=number of symbols in formula
     ## conv params
-    nb_conv_layers=2
-    Fs = [34]*nb_conv_layers
-    Ks = [5]*nb_conv_layers
+    Fs = [34,28]
+    nb_symbols_2_process_layer1 = 1
+    Ks = [(D_embedding,nb_symbols_2_process_layer1)] # kernel = [H,W]
+    nb_symbols_2_process_layer1 = 1
+    Ks.append( (1,nb_symbols_2_process_layer1) )
     ## fc params
-    FCs = [len(classes)]
+    FCs = [action_space.n]
     ##
-    policy = Policy_ConvFcSoftmax(env,nb_filters1,nb_filters2,K1,K2)
-    ''' optimizer '''
+    policy = Policy_ConvFcSoftmax(env,CHW,Fs,Ks,FCs)
     print(f'{policy.print_mdl()}')
+    ''' optimizer '''
     optimizer = optim.Adam(policy.parameters(), lr=learning_rate)
     ## Start Training
     print('--- Start Training RL agent')

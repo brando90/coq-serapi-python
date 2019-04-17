@@ -1,18 +1,19 @@
 import torch
 from torch import nn
 
-D_embedding = 3
+from pdb import set_trace as st
+
+###
+
 AI_REP = {}
 
+tactics = ['reflexivity']
 
 class Policy_ConvFcSoftmax(nn.Module):
     '''
     Policy agent implement as a # conv layers then # fully connected layers Neural Network (NN).
     '''
     def __init__(self,env,CHW, Fs, Ks, FCs,do_bn=False):
-        ## TODO
-        state_space = env.observation_space.shape[0] # 4 = |S| = |(cp,cv,pa,pv)| = |(cart_pos,cart_vel, pol_ang,pol_vel)|
-        action_space = env.action_space.n # 2 = |A| = |(left,right)|
         super().__init__()
         ''' RL statistics '''
         ## statistics tracked during current episode
@@ -29,10 +30,15 @@ class Policy_ConvFcSoftmax(nn.Module):
         layer = 0
         self.convs = []
         self.bns_convs = []
-        out = Variable(torch.FloatTensor(1, C,H,W))
+        out = torch.FloatTensor(1, C,H,W)
+        print(f'out.size() = {out.size()}')
         in_channels = C
+        print()
         for i in range(self.nb_conv_layers):
+            print(f'-> i = {i}')
             F,K = Fs[i], Ks[i]
+            print(f'F[{i}],K[{i}] = {F,K}')
+            print(f'out.size() = {out.size()}')
             ##
             conv = nn.Conv2d(in_channels,F,K) #(in_channels, out_channels, kernel_size)
             setattr(self,f'conv{i}',conv)
@@ -71,7 +77,6 @@ class Policy_ConvFcSoftmax(nn.Module):
         ##
         i = self.nb_fcs_layers-1
         out_features = FCs[i]
-        bias = self._bias_flag(only_1st_layer_bias, layer)
         fc = nn.Linear(in_features, out_features)
         layer+=1
         ##
