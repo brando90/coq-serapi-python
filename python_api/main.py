@@ -10,6 +10,7 @@ import torch.optim as optim
 from torch.distributions import Categorical
 
 import coq_env
+from ai_mathematician import Coq2Vec
 from ai_mathematician import AI_REP
 from ai_mathematician import Policy_ConvFcSoftmax
 
@@ -108,6 +109,7 @@ def train(policy,optimizer,env,gamma,nb_episodes=1000,time_steps=1000,ema_alpha=
 
 if __name__ == '__main__':
     DEBUG = args.DEBUG
+    D_embedding = args.D_embedding
     ''' create Env '''
     doc_name = 'foo.v'
     state_embedder = Coq2Vec(D_embedding,ai_coq_embeddings={})
@@ -123,7 +125,6 @@ if __name__ == '__main__':
     ''' Policy/AI-Mathematician '''
     action_space = env.action_space
     print(f'Action space/tactics: {env.action_space}')
-    D_embedding = args.D_embedding
     ## CHW = (C=1,H=D_embedding,W=nb_symbols_in_input)
     #NOTE: filter sizes are limited by the number of symbols in the inpiut check evernote FILTER SIZE CONVAITP
     nb_symbols_in_input = 1

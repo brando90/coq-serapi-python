@@ -1,6 +1,8 @@
 import torch
 from torch import nn
 
+from sexpdata import loads
+
 from pythonize_goals import Goals
 
 from pdb import set_trace as st
@@ -11,7 +13,7 @@ AI_REP = {}
 
 class Coq2Vec:
 
-    def __init__(D_embedding,ai_coq_embeddings={}):
+    def __init__(self,D_embedding,ai_coq_embeddings={}):
         super().__init__()
         ''' '''
         self.ai_coq_embeddings = ai_coq_embeddings
@@ -23,22 +25,18 @@ class Coq2Vec:
             if D != D_embedding:
                 raise ValueError(f'Dimensions of embeddings already in dictionary and given set embedding dont match: (D,D_embedding) -> {D} != {D_embedding}.')
 
-    def get_or_add_new(self,symbol):
+    def __call__(self,sexp):
         '''
-        Adds a new Symbol or Coq term to dictionary of embeddings
         '''
-        key = symbol
-        if key not in AI_REP:
-            embedding = torch.rand(self.D_embedding,1)
-            AI_REP[key] = embedding
-        else:
-            embedding = AI_REP[key]
+        # make into pythonized s-expression
+        print(f'sexp = {sexp}')
+        psexp = loads(str(sexp))
+        st()
+        # parse into a python object rep of the coq AST
+        all_goals = Goals(all_goals)
+        # gets embeddings if they exist, otherwise, it adds it to the ai_coq_embeddings dictionary/database.
+        embedding = all_goals.fg_goals[0].ty.embedding(self.ai_coq_embeddings) # this function
         return embedding
-
-    def __call__(self,symbol):
-        '''
-        '''
-        return get_or_add_new(symbol)
 
 class Policy_ConvFcSoftmax(nn.Module):
     '''

@@ -5,17 +5,16 @@ from pdb import set_trace as st
 
 import torch
 
-'''
-TODO: have the embedding function take the dictionary and run the add to func
-there.
-'''
-
-def add_2_AI_REP(key):
-    if key not in AI_REP:
+def get_or_add_new(key,ai_coq_embeddings):
+    '''
+    Returns the embedding of the given term given by key if it exists
+    otherwise it adds a new random vector to the ai_coq_embeddings dictionary.
+    '''
+    if key not in ai_coq_embeddings:
         embedding = torch.rand(D,1)
-        AI_REP[key] = embedding
+        ai_coq_embeddings[key] = embedding
     else:
-        embedding = AI_REP[key]
+        embedding = ai_coq_embeddings[key]
     return embedding
 
 # From names.mli
@@ -26,8 +25,8 @@ class Id(object):
     def __repr__(self):
         return self.value.__repr__()
 
-    def embedding(self):
-        embedding = add_2_AI_REP(self.value)
+    def embedding(self,ai_coq_embeddings):
+        embedding = get_or_add_new(self.value,ai_coq_embeddings)
         return embedding
 
 class Constant(object):
@@ -38,8 +37,8 @@ class Constant(object):
     def __repr__(self):
         return self.value.__repr__()
 
-    def embedding(self):
-        embedding = add_2_AI_REP(self.value)
+    def embedding(self,ai_coq_embeddings):
+        embedding = get_or_add_new(self.value,ai_coq_embeddings)
         return embedding
 
 class Inductive(object):
@@ -51,9 +50,9 @@ class Inductive(object):
     def __repr__(self):
         return "Inductive " + self.idx.__repr__()
 
-    def embedding(self):
+    def embedding(self,ai_coq_embeddings):
         print(f'\n self.mutind = {self.mutind}')
-        embedding = add_2_AI_REP(self.mutind.name)
+        embedding = get_or_add_new(self.mutind.name,ai_coq_embeddings)
         return embedding
 
 class KerPair(object):
@@ -73,7 +72,7 @@ class Constr(object): #Coq term
     def __repr__(self):
         return self.sexp.__repr__()
 
-    def embedding(self):
+    def embedding(self,ai_coq_embeddings):
         '''
         Since Constr is an abstract class so it doesn't have an embedding
         '''
@@ -90,9 +89,9 @@ class Ind(Constr):
     def __repr__(self):
         return "Ind " + self.inductive.__repr__()
 
-    def embedding(self):
+    def embedding(self,ai_coq_embeddings):
         print(f'\nself.sexp = {self.sexp}')
-        embedding = self.inductive.embedding()
+        embedding = self.inductive.embedding(ai_coq_embeddings)
         return embedding
 
 class Construct(Constr):
@@ -106,10 +105,10 @@ class Construct(Constr):
     def __repr__(self):
         return "Ind " + self.inductive.__repr__()
 
-    def embedding(self):
-        print(f'\nself.sexp = {self.sexp}')
+    def embedding(self,ai_coq_embeddings):
+        #print(f'\nself.sexp = {self.sexp}')
         cons = self.inductive.mutind.name + str(self.index)
-        embedding = add_2_AI_REP(cons)
+        embedding = get_or_add_new(cons,ai_coq_embeddings)
         return embedding
 
 class Rel(Constr):
@@ -128,8 +127,8 @@ class Var(Constr):
     def __repr__(self):
         return "Var " + self.var.__repr__()
 
-    def embedding(self):
-        embedding = self.var.embedding()
+    def embedding(self,ai_coq_embeddings):
+        embedding = self.var.embedding(ai_coq_embeddings)
         return embedding
 
 class Prod(Constr):
@@ -165,11 +164,11 @@ class App(Constr):
     def __repr__(self):
         return "App " + self.head.__repr__() + "@" + self.args.__repr__()
 
-    def embedding(self):
-        embedding_head = self.head.embedding() # [0.3, ...., 1.8]
+    def embedding(self,ai_coq_embeddings):
+        embedding_head = self.head.embedding(ai_coq_embeddings) # [0.3, ...., 1.8]
         args_embeddings = []
         for arg in self.args:
-            arg_embedding = arg.embedding()
+            arg_embedding = arg.embedding(ai_coq_embeddings)
             args_embeddings.append( arg_embedding )
         return args_embeddings
 
@@ -182,8 +181,8 @@ class Const(Constr): # is a directory path e.g.
     def __repr__(self):
         return f"Const {self.constant}"
 
-    def embedding(self):
-        embedding = self.constant.embedding()
+    def embedding(self,ai_coq_embeddings):
+        embedding = self.constant.embedding(ai_coq_embeddings)
         return embedding
 
 class Hyp:
@@ -269,3 +268,77 @@ def build_obj(sexp):
         return coq_term
     else:
         return Constr(sexp)
+
+def pythonize_something():
+    '''
+
+    '''
+    ##
+    '''
+    1 subgoal (ID 10)
+
+      n : nat
+      ============================
+      0 + n = n
+    '''
+    sexp = '''
+        (Answer 2
+         (ObjList
+          ((CoqGoal
+            ((fg_goals
+              (((name 4)
+                (ty
+                 (App
+                  (Ind
+                   (((Mutind (MPfile (DirPath ((Id Logic) (Id Init) (Id Coq))))
+                      (DirPath ()) (Id eq))
+                     0)
+                    (Instance ())))
+                  ((Ind
+                    (((Mutind (MPfile (DirPath ((Id Datatypes) (Id Init) (Id Coq))))
+                       (DirPath ()) (Id nat))
+                      0)
+                     (Instance ())))
+                   (App
+                    (Const
+                     ((Constant (MPfile (DirPath ((Id Nat) (Id Init) (Id Coq))))
+                       (DirPath ()) (Id add))
+                      (Instance ())))
+                    ((Construct
+                      ((((Mutind
+                          (MPfile (DirPath ((Id Datatypes) (Id Init) (Id Coq))))
+                          (DirPath ()) (Id nat))
+                         0)
+                        1)
+                       (Instance ())))
+                     (Var (Id n))))
+                   (Var (Id n)))))
+                (hyp
+                 ((((Id n)) ()
+                   (Ind
+                    (((Mutind (MPfile (DirPath ((Id Datatypes) (Id Init) (Id Coq))))
+                       (DirPath ()) (Id nat))
+                      0)
+                     (Instance ())))))))))
+             (bg_goals ()) (shelved_goals ()) (given_up_goals ()))))))
+    '''
+    ai_coq_embeddings = {}
+    psexp = loads(sexp)
+    print('parsed s-expression')
+    print(f'psexp = {psexp}')
+    print()
+    all_goals = psexp[2][1][0][1] # [ fg_goals ..., bg_goals ..., shelved_goals ..., given_up_goals ...]
+    print('print all goals')
+    print(f'all_goals[0]={all_goals[0]}\nall_goals[1]={all_goals[1]}\nall_goals[2]={all_goals[2]}\nall_goals[3]={all_goals[3]}')
+    print()
+    print('---> Start decorating the object')
+    all_goals = Goals(all_goals)
+    print(f'all_goals = {all_goals}')
+    print()
+    print('printed parsed ty object inside goal')
+    print(f'all_goals.fg_goals.ty = {all_goals.fg_goals[0].ty}')
+    print()
+    print('---')
+    print('print the embeddings for the Coq Term AST')
+    embedding = all_goals.fg_goals[0].ty.embedding(ai_coq_embeddings)
+    print(f'embedding = {embedding}')
