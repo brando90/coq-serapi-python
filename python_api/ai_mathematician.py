@@ -1,13 +1,44 @@
 import torch
 from torch import nn
 
+from pythonize_goals import Goals
+
 from pdb import set_trace as st
 
 ###
 
 AI_REP = {}
 
-tactics = ['reflexivity']
+class Coq2Vec:
+
+    def __init__(D_embedding,ai_coq_embeddings={}):
+        super().__init__()
+        ''' '''
+        self.ai_coq_embeddings = ai_coq_embeddings
+        self.D_embedding = D_embedding
+        ## make sure that D_embedding matches the dimension of the embeddings already in the
+        if ai_coq_embeddings != {}:
+            any_dict_key = ai_coq_embeddings.keys()[0]
+            D = self.ai_coq_embeddings[any_dict_key].size()
+            if D != D_embedding:
+                raise ValueError(f'Dimensions of embeddings already in dictionary and given set embedding dont match: (D,D_embedding) -> {D} != {D_embedding}.')
+
+    def get_or_add_new(self,symbol):
+        '''
+        Adds a new Symbol or Coq term to dictionary of embeddings
+        '''
+        key = symbol
+        if key not in AI_REP:
+            embedding = torch.rand(self.D_embedding,1)
+            AI_REP[key] = embedding
+        else:
+            embedding = AI_REP[key]
+        return embedding
+
+    def __call__(self,symbol):
+        '''
+        '''
+        return get_or_add_new(symbol)
 
 class Policy_ConvFcSoftmax(nn.Module):
     '''

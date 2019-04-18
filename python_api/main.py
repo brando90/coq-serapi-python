@@ -13,6 +13,8 @@ import coq_env
 from ai_mathematician import AI_REP
 from ai_mathematician import Policy_ConvFcSoftmax
 
+from pythonize_goals import Goals
+
 #import plotting as my_plt
 
 from pdb import set_trace as st
@@ -80,15 +82,11 @@ def train(policy,optimizer,env,gamma,nb_episodes=1000,time_steps=1000,ema_alpha=
     Model is trained in episodes. For each episode it train untils a horizon equal to the # of time steps.
     After it's done with an episode using the rewards collected during that episode,
     the model is updated.
-    The running return is a way to track if in the recent history of the episodes, the agent has
-    balanced the pole long enough. If it has, then the whole training is finished.
-    If it has balances the pole for a lot for the past say 100, then the task has been solved.
-    This is implemented with an Exponetial Moving Average (EMA) however.
     '''
-    running_return = 0
+    #running_return = 0
+    state, reward, done, _ = env.step('Example test_oddb1: Nat.odd 1 = true.')
+    print(f'state = {state}')
     for i_episode in range(nb_episodes):
-    #for i_episode in count(1):
-        state, ep_return = env.reset(), 0
         for t in range(time_steps):  # Don't infinite loop while learning
             action = policy.select_action(state)
             st()
@@ -98,27 +96,25 @@ def train(policy,optimizer,env,gamma,nb_episodes=1000,time_steps=1000,ema_alpha=
                 env.render()
             policy.episode_rewards.append(reward)
             ep_return += reward
-            if done: # whether it’s time to reset the environment again. Most (but not all) tasks are divided up into well-defined episodes, and done being True indicates the episode has terminated.
-                break
-        running_return = ema_alpha * ep_return + (1 - ema_alpha) * running_return
+            # Check whether it’s time to reset the environment again.
+            # Most (but not all) tasks are divided up into well-defined episodes, and done being True indicates the episode has terminated.
+            if done:
+                #TODO for the moment we exit, but it should proceed to prove the next theorem
+                return
         finish_episode(policy,optimizer, gamma)
         #prints every logs_interval e.g. every 10 episodes
         if i_episode % args.log_interval == 0:
-            print(f'Episode {i_episode}\tLast length: {t}\tEpisode reward/length or EMA running_return: {running_return}')
-        #check if task has been solved, exit training. Task solved for this env means that the agent has been able to hold the stick up for 475 steps for sufficient number of different episodes
-        if running_return > env.spec.reward_threshold:
-            print("---> Solved! Running return is now {running_return} and the last episode runs to {t} time steps! \a")
-            break
-    print(f'Running return = {running_return}\tenv.spec.reward_threshold={env.spec.reward_threshold}')
+            print(f'Episode {i_episode}\tLast length: {t}\tep_return = {ep_return}')
 
 if __name__ == '__main__':
     DEBUG = args.DEBUG
     ''' create Env '''
     doc_name = 'foo.v'
-    env = coq_env.CoqEnv(doc_name,DEBUG)
+    state_embedder = Coq2Vec(D_embedding,ai_coq_embeddings={})
+    env = coq_env.CoqEnv(doc_name,DEBUG,state_embedder=state_embedder)
     #env.seed(args.seed)
     #torch.manual_seed(args.seed)
-    print(f'env = {env}')
+    print(f'doc name = {doc_name} \nenv = {env}')
     ''' params for training '''
     nb_episodes = args.nb_episodes
     gamma = args.gamma

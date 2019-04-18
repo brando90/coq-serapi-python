@@ -38,7 +38,15 @@ class ActionSpace:
 
         https://pjreddie.com/coq-tactics/
         '''
-        self.actions = ['reflexivity','assumption','discriminate','constructor','symmetry']
+        ## some tactics https://pjreddie.com/coq-tactics/
+        tactics_no_args = ['simpl.','reflexivity','assumption.','intros.','discriminate.','constructor.','subst.','symmetry.']
+        #tactics_lazy = ['auto.','intuition.','omega.']
+        #tactics_args = ['apply {}.', 'rewrite {} {}.', 'cut {}.', 'unfold {}.', 'destruct {}.','induction {}.']
+
+        tactics = tactics_no_args
+        ## set available tactics
+        #self.actions = tactics + tactics_lazy
+        self.actions = tactics
         self.n = len(self.actions)
 
     def __repr__(self):
@@ -47,18 +55,20 @@ class ActionSpace:
 class CoqEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
-    def __init__(self,doc_name,debug):
+    def __init__(self,doc_name,debug,state_embedder=lambda x: x):
         '''
         instruction for gym:
         https://github.com/openai/gym/tree/master/gym/envs
         example:
         https://github.com/openai/gym-soccer/tree/master/gym_soccer
         '''
+        ## start Coq API process and create a document
         self.coq = coq_api.Coq(debug=debug)
-        result_new_doc = self.coq.new_doc(doc_name)
-        ##
+        result_new_doc = self.coq.new_doc(doc_name) # the result serapi gives for successful creation of a document
+        ## define action space
         self.action_space = ActionSpace()
-
+        ## function that maps States -> Representation, default identity
+        self.state_embedder = state_embedder
 
     def step(self, action):
         ''' Takes an action in the Coq env.
@@ -107,6 +117,7 @@ class CoqEnv(gym.Env):
         ## get state = (current_goal, context)
         query_result = self.coq.query('Goals')
         state = str(query_result[1])
+        state = state_embedder(state)
         #print(f'type(state) = {type(state)}')
         #print(f'query_result[0] = {query_result[0]}') # start of msg
         #print(f'query_result[1] = {query_result[1]}') # real content
@@ -116,6 +127,8 @@ class CoqEnv(gym.Env):
         return state, reward, done, info
 
     def reset(self):
+        '''
+        '''
         return
 
     def render(self, mode='human', close=False):
