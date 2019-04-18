@@ -5,6 +5,11 @@ from pdb import set_trace as st
 
 import torch
 
+'''
+TODO: have the embedding function take the dictionary and run the add to func
+there.
+'''
+
 def add_2_AI_REP(key):
     if key not in AI_REP:
         embedding = torch.rand(D,1)
