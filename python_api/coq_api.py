@@ -21,6 +21,7 @@ class Coq:
             debug (bool): True when in debugging state.
         '''
         ## start serapi, TODO: --no_init flag, think about how to use feedback for ML better
+        #serapi_cmd = ['sertop','--no_init','--printer=human']
         serapi_cmd = ['sertop','--no_init']
         if debug:
             print(f'serapi_cmd = {serapi_cmd}')

@@ -27,10 +27,12 @@ class Coq2Vec:
 
     def __call__(self,sexp):
         '''
+
         '''
         # make into pythonized s-expression
         print(f'sexp = {sexp}')
-        psexp = loads(str(sexp))
+        psexp = loads(sexp)
+        print(f'psexp = {psexp}')
         st()
         # parse into a python object rep of the coq AST
         all_goals = Goals(all_goals)

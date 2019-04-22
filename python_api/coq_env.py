@@ -39,7 +39,7 @@ class ActionSpace:
         https://pjreddie.com/coq-tactics/
         '''
         ## some tactics https://pjreddie.com/coq-tactics/
-        tactics_no_args = ['simpl.','reflexivity','assumption.','intros.','discriminate.','constructor.','subst.','symmetry.']
+        tactics_no_args = ['simpl.','reflexivity','assumption.','intros.','discriminate.','constructor.','subst.','symmetry.','Qed.']
         #tactics_lazy = ['auto.','intuition.','omega.']
         #tactics_args = ['apply {}.', 'rewrite {} {}.', 'cut {}.', 'unfold {}.', 'destruct {}.','induction {}.']
 
@@ -90,7 +90,9 @@ class CoqEnv(gym.Env):
         action_result = self.coq.add(action) # array of coq responses
         ## type check every step #TODO is this check better like this or parse it with sexp?
         coq_exceptions = []
+        #i = 0
         for action_line in action_result:
+            #print(f'i={i}')
             ## extract Added number and execute that added statement
             action_line = str(action_line,"utf-8")
             if 'Added' in action_line:
@@ -106,6 +108,7 @@ class CoqEnv(gym.Env):
                         coq_exceptions.append(action_line)
                         ## add action that caused exception happened
                         info['CoqExn'] = action_result
+            #i+=1
         ## evalaute reward
         reward = 0
         if len(coq_exceptions) > 0: # if it didn't type check
@@ -116,7 +119,7 @@ class CoqEnv(gym.Env):
             reward = 0
         ## get state = (current_goal, context)
         query_result = self.coq.query('Goals')
-        state = str(query_result[1]) #only the first index contains the (current_goal, context), rest is useless info about protocol to talk to serapi
+        state = query_result[1].decode('utf-8') #only the first index contains the (current_goal, context), rest is useless info about protocol to talk to serapi
         state = self.state_embedder(state)
         #print(f'type(state) = {type(state)}')
         #print(f'query_result[0] = {query_result[0]}') # start of msg

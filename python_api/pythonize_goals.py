@@ -322,6 +322,10 @@ def pythonize_something():
                      (Instance ())))))))))
              (bg_goals ()) (shelved_goals ()) (given_up_goals ()))))))
     '''
+    sexp = ''' b'(Answer 3(ObjList((CoqGoal((fg_goals(((name 3)(ty(Prod(Name(Id n))(Ind(((Mutind(MPfile(DirPath((Id Datatypes)(Id Init)(Id Coq))))(DirPath())(Id nat))0)(Instance())))(App(Ind(((Mutind(MPfile(DirPath((Id Logic)(Id Init)(Id Coq))))(DirPath())(Id eq))0)(Instance())))((Ind(((Mutind(MPfile(DirPath((Id Datatypes)(Id Init)(Id Coq))))(DirPath())(Id nat))0)(Instance())))(App(Const((Constant(MPfile(DirPath((Id Nat)(Id Init)(Id Coq))))(DirPath())(Id add))(Instance())))((Construct((((Mutind(MPfile(DirPath((Id Datatypes)(Id Init)(Id Coq))))(DirPath())(Id nat))0)1)(Instance())))(Rel 1)))(Rel 1)))))(hyp()))))(bg_goals())(shelved_goals())(given_up_goals()))))))\n'
+    '''
+    sexp = ''' (Answer 3(ObjList((CoqGoal((fg_goals(((name 3)(ty(Prod(Name(Id n))(Ind(((Mutind(MPfile(DirPath((Id Datatypes)(Id Init)(Id Coq))))(DirPath())(Id nat))0)(Instance())))(App(Ind(((Mutind(MPfile(DirPath((Id Logic)(Id Init)(Id Coq))))(DirPath())(Id eq))0)(Instance())))((Ind(((Mutind(MPfile(DirPath((Id Datatypes)(Id Init)(Id Coq))))(DirPath())(Id nat))0)(Instance())))(App(Const((Constant(MPfile(DirPath((Id Nat)(Id Init)(Id Coq))))(DirPath())(Id add))(Instance())))((Construct((((Mutind(MPfile(DirPath((Id Datatypes)(Id Init)(Id Coq))))(DirPath())(Id nat))0)1)(Instance())))(Rel 1)))(Rel 1)))))(hyp()))))(bg_goals())(shelved_goals())(given_up_goals()))))))'
+    '''
     ai_coq_embeddings = {}
     psexp = loads(sexp)
     print('parsed s-expression')
@@ -342,3 +346,7 @@ def pythonize_something():
     print('print the embeddings for the Coq Term AST')
     embedding = all_goals.fg_goals[0].ty.embedding(ai_coq_embeddings)
     print(f'embedding = {embedding}')
+
+if __name__ == '__main__':
+    print('Running MAIN')
+    pythonize_something()
