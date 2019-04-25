@@ -1,5 +1,6 @@
 import torch
 from torch import nn
+import torch.nn.functional as F
 
 from sexpdata import loads
 
@@ -37,14 +38,14 @@ class Coq2Vec:
         all_goals = psexp[2][1][0][1] # [ fg_goals ..., bg_goals ..., shelved_goals ..., given_up_goals ...]
         # parse into a python object rep of the coq AST
         all_goals = Goals(all_goals)
-        print(f'all_goals = {all_goals}')
-        # gets embeddings if they exist, otherwise, it adds it to the ai_coq_embeddings dictionary/database.
-        print('--calling ty.embedding()')
-        print(f'all_goals.fg_goals[0].ty = {all_goals.fg_goals[0].ty}')
-        print(f'all_goals.fg_goals[0].ty.embedding = {all_goals.fg_goals[0].ty.embedding}')
+        # print(f'all_goals = {all_goals}')
+        # # gets embeddings if they exist, otherwise, it adds it to the ai_coq_embeddings dictionary/database.
+        # print('--calling ty.embedding()')
+        # print(f'all_goals.fg_goals[0].ty = {all_goals.fg_goals[0].ty}')
+        # print(f'all_goals.fg_goals[0].ty.embedding = {all_goals.fg_goals[0].ty.embedding}')
         embedding = all_goals.fg_goals[0].ty.embedding(self.ai_coq_embeddings)
-        print(f'embedding = {embedding}')
-        st()
+        D_embedding,nb_terms = embedding.size()
+        embedding = embedding.view( (1,1,D_embedding,nb_terms) ) # dims = (N,C,H,W)
         return embedding
 
 class Policy_ConvFcSoftmax(nn.Module):

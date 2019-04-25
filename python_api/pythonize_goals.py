@@ -183,13 +183,14 @@ class App(Constr):
         return "App " + self.head.__repr__() + "@" + self.args.__repr__()
 
     def embedding(self,ai_coq_embeddings):
-        ## TODO check with emilio if this method is right
         embedding_head = self.head.embedding(ai_coq_embeddings) # [0.3, ...., 1.8]
-        args_embeddings = [embedding_head]
-        for arg in self.args:
+        embedding = embedding_head
+        #for arg in self.args:
+        for i, arg in enumerate(self.args):
             arg_embedding = arg.embedding(ai_coq_embeddings)
-            args_embeddings.append( arg_embedding )
-        return args_embeddings
+            embedding = torch.cat((arg_embedding,embedding),1)
+            #embedding = torch.stack((arg_embedding,embedding),1)
+        return embedding
 
 class Const(Constr): # is a directory path e.g.
     def __init__(self, sexp):

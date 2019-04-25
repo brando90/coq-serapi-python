@@ -89,7 +89,7 @@ def train(policy,optimizer,env,gamma,nb_episodes=1000,time_steps=1000,ema_alpha=
     #(Add () "Theorem plus_O_n : forall n : nat, 0 + n = n. intros n. simpl. reflexivity. Qed." )
     #state, reward, done, _ = env.step('Theorem plus_O_n : forall n : nat, 0 + n = n.')
     state, reward, done, _ = env.step('Theorem plus_O_n n : 0 + n = n.')
-    print(f'state = {state}')
+    print(f'start_state = {state}')
     for i_episode in range(nb_episodes):
         for t in range(time_steps):  # Don't infinite loop while learning
             action = policy.select_action(state)
