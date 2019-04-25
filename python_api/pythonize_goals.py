@@ -10,6 +10,8 @@ def get_or_add_new(key,ai_coq_embeddings):
     Returns the embedding of the given term given by key if it exists
     otherwise it adds a new random vector to the ai_coq_embeddings dictionary.
     '''
+    D = ai_coq_embeddings['D_embedding']
+    #print(f'D = {D}')
     if key not in ai_coq_embeddings:
         embedding = torch.rand(D,1)
         ai_coq_embeddings[key] = embedding
@@ -31,7 +33,7 @@ class Id(object):
 
 class Constant(object):
     def __init__(self, sexp):
-        print(f'+++> Constant = {str(sexp)}')
+        #print(f'+++> Constant = {str(sexp)}')
         self.value = str(sexp) # TODO: fixme
 
     def __repr__(self):
@@ -43,7 +45,7 @@ class Constant(object):
 
 class Inductive(object):
     def __init__(self, sexp):
-        print(f'=====> Inductive sexp = {sexp}')
+        #print(f'=====> Inductive sexp = {sexp}')
         self.mutind = KerPair(sexp)
         self.idx = sexp[1] #int
 
@@ -51,7 +53,7 @@ class Inductive(object):
         return "Inductive " + self.idx.__repr__()
 
     def embedding(self,ai_coq_embeddings):
-        print(f'\n self.mutind = {self.mutind}')
+        #print(f'\n self.mutind = {self.mutind}')
         embedding = get_or_add_new(self.mutind.name,ai_coq_embeddings)
         return embedding
 
@@ -76,12 +78,13 @@ class Constr(object): #Coq term
         '''
         Since Constr is an abstract class so it doesn't have an embedding
         '''
-        print(f'--> Unhandled op in Constr with self.sexp = {self.sexp}')
+        #print(f'--> Unhandled op in Constr with self.sexp = {self.sexp}')
+        raise ValueError(f'UNHANDLED OP Constr with self.sexp = {self.sexp}')
 
 class Ind(Constr):
     def __init__(self, sexp):
         super().__init__(sexp)
-        print(f'------> Ind sexp = {sexp}')
+        #print(f'------> Ind sexp = {sexp}')
         mutind = sexp[1][0][0]
         self.inductive = Inductive(mutind[1])
         self.universes = sexp[1][0][1]
@@ -90,14 +93,14 @@ class Ind(Constr):
         return "Ind " + self.inductive.__repr__()
 
     def embedding(self,ai_coq_embeddings):
-        print(f'\nself.sexp = {self.sexp}')
+        #print(f'\nself.sexp = {self.sexp}')
         embedding = self.inductive.embedding(ai_coq_embeddings)
         return embedding
 
 class Construct(Constr):
     def __init__(self, sexp):
         super().__init__(sexp)
-        print(f'------> Ind sexp = {sexp}')
+        #print(f'------> Ind sexp = {sexp}')
         self.inductive = Inductive(sexp[1][0][0][0])
         self.index = sexp[1][0][0][1] #TODO, part of the definition of the type/construct, concatate to the inductive embedding alter
         self.universes = sexp[1][0][1] #TODO
@@ -135,12 +138,27 @@ class Prod(Constr):
     def __init__(self, sexp):
         super().__init__(sexp)
         # Todo
+        self.sexp = sexp
         # self.binder = list(map(...,sexp[0]))
-        self.binder_type = build_obj(sexp[1])
+        self.binder_type = build_obj(sexp[1]) #this is a constr so embedding is not implemented...
         self.body = build_obj(sexp[2])
 
     def __repr__(self):
         return "Prod "
+
+    def embedding(self,ai_coq_embeddings):
+        # print('func embedding')
+        # print(f'self.binder_type = {self.binder_type}')
+        # print(f'self.body = {self.body}')
+        # print(f'self.binder_type.embedding = {self.binder_type.embedding}')
+        # print(f'self.body.embedding = {self.body.embedding}')
+        # print(f'sexp[1] = {self.sexp[1]}')
+        # print(f'sexp[2] = {self.sexp[2]}')
+        # st()
+        print(f'self.binder_type = {self.binder_type}')
+        print(f'self.binder_type.embedding = {self.binder_type.embedding}')
+        embedding = self.binder_type.embedding(ai_coq_embeddings)
+        return embedding
 
 class Lambda(Constr):
     def __init__(self, sexp):
@@ -156,7 +174,7 @@ class Lambda(Constr):
 class App(Constr):
     def __init__(self, sexp):
         super().__init__(sexp)
-        print(f'+++> sexp[1] = {sexp[1]}')
+        #print(f'+++> sexp[1] = {sexp[1]}')
         self.head = build_obj(sexp[1])
         #self.args = list(map(build_obj, sexp[2]))
         self.args = [ build_obj(arg) for arg in sexp[2] ]
@@ -165,8 +183,9 @@ class App(Constr):
         return "App " + self.head.__repr__() + "@" + self.args.__repr__()
 
     def embedding(self,ai_coq_embeddings):
+        ## TODO check with emilio if this method is right
         embedding_head = self.head.embedding(ai_coq_embeddings) # [0.3, ...., 1.8]
-        args_embeddings = []
+        args_embeddings = [embedding_head]
         for arg in self.args:
             arg_embedding = arg.embedding(ai_coq_embeddings)
             args_embeddings.append( arg_embedding )
@@ -215,7 +234,7 @@ class Goal:
         ## store type
         ty_array = sexp[1] # [Symbol('ty'), [...type...] ]
         ty = ty_array[1] # [...type...] e.g. [Symbol('App'), ... ]
-        print(f'===> ty = {ty}\n')
+        #print(f'===> ty = {ty}\n')
         self.ty = build_obj(ty)
         ## store hypothsis/local proof
         hyp_array = sexp[2] # [Symbol('hyp') , [...hyp...] ]
@@ -322,11 +341,10 @@ def pythonize_something():
                      (Instance ())))))))))
              (bg_goals ()) (shelved_goals ()) (given_up_goals ()))))))
     '''
-    sexp = ''' b'(Answer 3(ObjList((CoqGoal((fg_goals(((name 3)(ty(Prod(Name(Id n))(Ind(((Mutind(MPfile(DirPath((Id Datatypes)(Id Init)(Id Coq))))(DirPath())(Id nat))0)(Instance())))(App(Ind(((Mutind(MPfile(DirPath((Id Logic)(Id Init)(Id Coq))))(DirPath())(Id eq))0)(Instance())))((Ind(((Mutind(MPfile(DirPath((Id Datatypes)(Id Init)(Id Coq))))(DirPath())(Id nat))0)(Instance())))(App(Const((Constant(MPfile(DirPath((Id Nat)(Id Init)(Id Coq))))(DirPath())(Id add))(Instance())))((Construct((((Mutind(MPfile(DirPath((Id Datatypes)(Id Init)(Id Coq))))(DirPath())(Id nat))0)1)(Instance())))(Rel 1)))(Rel 1)))))(hyp()))))(bg_goals())(shelved_goals())(given_up_goals()))))))\n'
-    '''
-    sexp = ''' (Answer 3(ObjList((CoqGoal((fg_goals(((name 3)(ty(Prod(Name(Id n))(Ind(((Mutind(MPfile(DirPath((Id Datatypes)(Id Init)(Id Coq))))(DirPath())(Id nat))0)(Instance())))(App(Ind(((Mutind(MPfile(DirPath((Id Logic)(Id Init)(Id Coq))))(DirPath())(Id eq))0)(Instance())))((Ind(((Mutind(MPfile(DirPath((Id Datatypes)(Id Init)(Id Coq))))(DirPath())(Id nat))0)(Instance())))(App(Const((Constant(MPfile(DirPath((Id Nat)(Id Init)(Id Coq))))(DirPath())(Id add))(Instance())))((Construct((((Mutind(MPfile(DirPath((Id Datatypes)(Id Init)(Id Coq))))(DirPath())(Id nat))0)1)(Instance())))(Rel 1)))(Rel 1)))))(hyp()))))(bg_goals())(shelved_goals())(given_up_goals()))))))'
-    '''
+    #sexp = b'(Answer 3(ObjList((CoqGoal((fg_goals(((name 3)(ty(Prod(Name(Id n))(Ind(((Mutind(MPfile(DirPath((Id Datatypes)(Id Init)(Id Coq))))(DirPath())(Id nat))0)(Instance())))(App(Ind(((Mutind(MPfile(DirPath((Id Logic)(Id Init)(Id Coq))))(DirPath())(Id eq))0)(Instance())))((Ind(((Mutind(MPfile(DirPath((Id Datatypes)(Id Init)(Id Coq))))(DirPath())(Id nat))0)(Instance())))(App(Const((Constant(MPfile(DirPath((Id Nat)(Id Init)(Id Coq))))(DirPath())(Id add))(Instance())))((Construct((((Mutind(MPfile(DirPath((Id Datatypes)(Id Init)(Id Coq))))(DirPath())(Id nat))0)1)(Instance())))(Rel 1)))(Rel 1)))))(hyp()))))(bg_goals())(shelved_goals())(given_up_goals()))))))\n'
+    #sexp = sexp.decode('utf-8')
     ai_coq_embeddings = {}
+    ai_coq_embeddings['D_embedding'] = 3
     psexp = loads(sexp)
     print('parsed s-expression')
     print(f'psexp = {psexp}')
@@ -344,6 +362,10 @@ def pythonize_something():
     print()
     print('---')
     print('print the embeddings for the Coq Term AST')
+
+    print('--calling ty.embedding()')
+    print(f'all_goals.fg_goals[0].ty = {all_goals.fg_goals[0].ty}')
+    print(f'all_goals.fg_goals[0].ty.embedding = {all_goals.fg_goals[0].ty.embedding}')
     embedding = all_goals.fg_goals[0].ty.embedding(ai_coq_embeddings)
     print(f'embedding = {embedding}')
 

@@ -120,6 +120,7 @@ class CoqEnv(gym.Env):
         ## get state = (current_goal, context)
         query_result = self.coq.query('Goals')
         state = query_result[1].decode('utf-8') #only the first index contains the (current_goal, context), rest is useless info about protocol to talk to serapi
+        print(f'-------> state = {state}')
         state = self.state_embedder(state)
         #print(f'type(state) = {type(state)}')
         #print(f'query_result[0] = {query_result[0]}') # start of msg

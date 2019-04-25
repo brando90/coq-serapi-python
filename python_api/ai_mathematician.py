@@ -18,26 +18,33 @@ class Coq2Vec:
         ''' '''
         self.ai_coq_embeddings = ai_coq_embeddings
         self.D_embedding = D_embedding
+        ai_coq_embeddings['D_embedding'] = D_embedding
         ## make sure that D_embedding matches the dimension of the embeddings already in the
-        if ai_coq_embeddings != {}:
-            any_dict_key = ai_coq_embeddings.keys()[0]
-            D = self.ai_coq_embeddings[any_dict_key].size()
-            if D != D_embedding:
-                raise ValueError(f'Dimensions of embeddings already in dictionary and given set embedding dont match: (D,D_embedding) -> {D} != {D_embedding}.')
+        # if ai_coq_embeddings != {}:
+        #     # TODO extract anything that isn't D_embedding
+        #     any_dict_key = ai_coq_embeddings.keys()[0]
+        #     D = self.ai_coq_embeddings[any_dict_key].size()
+        #     if D != D_embedding:
+        #         raise ValueError(f'Dimensions of embeddings already in dictionary and given set embedding dont match: (D,D_embedding) -> {D} != {D_embedding}.')
 
     def __call__(self,sexp):
         '''
 
         '''
         # make into pythonized s-expression
-        print(f'sexp = {sexp}')
+        #sexp = sexp.decode('utf-8')
         psexp = loads(sexp)
-        print(f'psexp = {psexp}')
-        st()
+        all_goals = psexp[2][1][0][1] # [ fg_goals ..., bg_goals ..., shelved_goals ..., given_up_goals ...]
         # parse into a python object rep of the coq AST
         all_goals = Goals(all_goals)
+        print(f'all_goals = {all_goals}')
         # gets embeddings if they exist, otherwise, it adds it to the ai_coq_embeddings dictionary/database.
-        embedding = all_goals.fg_goals[0].ty.embedding(self.ai_coq_embeddings) # this function
+        print('--calling ty.embedding()')
+        print(f'all_goals.fg_goals[0].ty = {all_goals.fg_goals[0].ty}')
+        print(f'all_goals.fg_goals[0].ty.embedding = {all_goals.fg_goals[0].ty.embedding}')
+        embedding = all_goals.fg_goals[0].ty.embedding(self.ai_coq_embeddings)
+        print(f'embedding = {embedding}')
+        st()
         return embedding
 
 class Policy_ConvFcSoftmax(nn.Module):

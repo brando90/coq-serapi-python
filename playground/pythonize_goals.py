@@ -30,7 +30,7 @@ class Id(object):
 
 class Constant(object):
     def __init__(self, sexp):
-        print(f'+++> Constant = {str(sexp)}')
+        #print(f'+++> Constant = {str(sexp)}')
         self.value = str(sexp) # TODO: fixme
 
     def __repr__(self):
@@ -42,7 +42,7 @@ class Constant(object):
 
 class Inductive(object):
     def __init__(self, sexp):
-        print(f'=====> Inductive sexp = {sexp}')
+        #print(f'=====> Inductive sexp = {sexp}')
         self.mutind = KerPair(sexp)
         self.idx = sexp[1] #int
 
@@ -50,7 +50,7 @@ class Inductive(object):
         return "Inductive " + self.idx.__repr__()
 
     def embedding(self):
-        print(f'\n self.mutind = {self.mutind}')
+        #print(f'\n self.mutind = {self.mutind}')
         embedding = add_2_AI_REP(self.mutind.name)
         return embedding
 
@@ -75,12 +75,13 @@ class Constr(object): #Coq term
         '''
         Since Constr is an abstract class so it doesn't have an embedding
         '''
-        print(f'--> Unhandled op in Constr with self.sexp = {self.sexp}')
+        #print(f'--> Unhandled op in Constr with self.sexp = {self.sexp}')
+        raise ValueError(f'UNHANDLED OP Constr with self.sexp = {self.sexp}')
 
 class Ind(Constr):
     def __init__(self, sexp):
         super().__init__(sexp)
-        print(f'------> Ind sexp = {sexp}')
+        #print(f'------> Ind sexp = {sexp}')
         mutind = sexp[1][0][0]
         self.inductive = Inductive(mutind[1])
         self.universes = sexp[1][0][1]
@@ -89,14 +90,14 @@ class Ind(Constr):
         return "Ind " + self.inductive.__repr__()
 
     def embedding(self):
-        print(f'\nself.sexp = {self.sexp}')
+        #print(f'\nself.sexp = {self.sexp}')
         embedding = self.inductive.embedding()
         return embedding
 
 class Construct(Constr):
     def __init__(self, sexp):
         super().__init__(sexp)
-        print(f'------> Ind sexp = {sexp}')
+        #print(f'------> Ind sexp = {sexp}')
         self.inductive = Inductive(sexp[1][0][0][0])
         self.index = sexp[1][0][0][1] #TODO, part of the definition of the type/construct, concatate to the inductive embedding alter
         self.universes = sexp[1][0][1] #TODO
@@ -105,7 +106,7 @@ class Construct(Constr):
         return "Ind " + self.inductive.__repr__()
 
     def embedding(self):
-        print(f'\nself.sexp = {self.sexp}')
+        #print(f'\nself.sexp = {self.sexp}')
         cons = self.inductive.mutind.name + str(self.index)
         embedding = add_2_AI_REP(cons)
         return embedding
@@ -155,7 +156,7 @@ class Lambda(Constr):
 class App(Constr):
     def __init__(self, sexp):
         super().__init__(sexp)
-        print(f'+++> sexp[1] = {sexp[1]}')
+        #print(f'+++> sexp[1] = {sexp[1]}')
         self.head = build_obj(sexp[1])
         #self.args = list(map(build_obj, sexp[2]))
         self.args = [ build_obj(arg) for arg in sexp[2] ]
@@ -339,6 +340,10 @@ def pythonize_something():
     print()
     print('---')
     print('print the embeddings for the Coq Term AST')
+
+    print('--calling ty.embedding()')
+    print(f'all_goals.fg_goals[0].ty = {all_goals.fg_goals[0].ty}')
+    print(f'all_goals.fg_goals[0].ty.embedding = {all_goals.fg_goals[0].ty.embedding}')
     embedding = all_goals.fg_goals[0].ty.embedding()
     print(f'embedding = {embedding}')
 
